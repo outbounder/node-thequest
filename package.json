@@ -13,6 +13,7 @@
     "connect-mongo": "*",
     "session.socket.io": "*",
     "browserify": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "mongoose": "*"
   }
 }
