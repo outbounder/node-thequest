@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  h1= title
+  span.visitorsTitle Visitors:
+  span.visitorsCount= 0
+  script.
+    var socket = io.connect('http://localhost');
+    socket.on('visitorsOnline', function (data) {
+      $(".visitorsCount").html(data);
+    });
+    socket.on('callbackMe', function(data, callback) {
+      callback("Hellow");
+    });
