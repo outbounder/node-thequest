@@ -9,6 +9,10 @@
     "express": "3.0.0rc5",
     "jade": "*",
     "socket.io": "*",
-    "socket.io-client": "*"
+    "socket.io-client": "*",
+    "connect-mongo": "*",
+    "session.socket.io": "*",
+    "browserify": "*",
+    "underscore": "*"
   }
 }

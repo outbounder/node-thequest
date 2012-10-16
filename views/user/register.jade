@@ -1,0 +1,10 @@
+extends ../layout
+
+block content
+  h1 Register
+  .error #{error}
+  form(method="POST")
+    input(type="text", name="username", placeholder="username")
+    input(type="password", name="password", placeholder="password")
+    input(type="password2", name="password2", placeholder="password again")
+    input(type="submit", value="register")

@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1 TheQuest
+  a(href="/users/logout") logout
+  
+  span.visitorsTitle Visitors:
+  span.visitorsCount= 0
+  
+  script(src="/game-index.js")
