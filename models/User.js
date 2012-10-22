@@ -2,7 +2,7 @@ var Backbone = require("./Backbone");
 var crypto = require("crypto");
 
 var User = module.exports = Backbone.createModelSchema("User", {
-  username: { type: String, required: true },
+  username: { type: String, unique: true, required: true },
   password: { type: String, required: true },
   pre: {
     save: function(next) {
