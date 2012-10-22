@@ -1,3 +1,5 @@
+var User = require("../models/User");
+
 module.exports = {
   root: "/game",
   "GET ": [function(req, res, next){
@@ -6,6 +8,9 @@ module.exports = {
     else
       next();
   },function(req, res) {
-    res.render('game', { title: 'Thequest' });  
+    User.findById(req.session.userId, function(err, user){
+      if(err) return console.log(err);
+      res.render('game', { title: 'Thequest', user: user });    
+    });
   }]
 }

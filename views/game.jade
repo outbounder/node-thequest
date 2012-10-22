@@ -3,8 +3,11 @@ extends layout
 block content
   h1 TheQuest
   a(href="/users/logout") logout
+  .timeLeft
+  .gameWorld
   
   span.visitorsTitle Visitors:
   span.visitorsCount= 0
-  
+  script.
+    user = !{JSON.stringify(user)}
   script(src="/game-index.js")

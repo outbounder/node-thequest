@@ -2,7 +2,8 @@ var mongoose = require("mongoose");
 module.exports.db = null;
 
 module.exports.createModel = function(name, schema) {
-  return module.exports.db.model(name, schema);
+  var target = module.exports.db || mongoose;
+  return target.model(name, schema);
 };
 
 module.exports.createSchema = function(options) {
