@@ -25,3 +25,7 @@ a {
 .player.hasTreasure {
   background-color: red;
 }
+
+.player.hasTreasure.treasureLocked {
+  background-color: orange;
+}

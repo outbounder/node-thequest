@@ -30,6 +30,18 @@ socket.on("timeLeft", function(timeLeft){
   $(".timeLeft").html("Time left:"+timeLeft);
 });
 
+socket.on("treasuerTimeout", function(treasuerTimeout){
+  $(".treasuerTimeout").html("Treasure Locked:"+treasuerTimeout);
+});
+
+socket.on("treasureLocked", function(treasureLocked){
+  if(treasureLocked){
+    $(".player.hasTreasure").addClass('treasureLocked');
+  }else{
+    $(".treasureLocked").removeClass("treasureLocked");
+  }  
+});
+
 socket.on("connect", function(){
   socket.emit("addPlayer");
 });
