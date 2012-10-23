@@ -49,8 +49,13 @@ _.extend(module.exports.prototype, {
     }
   },
   movePlayer: function(player, dx, dy) {
+    var currentPosition = {x: player.x, y: player.y};
     player.x += dx;
     player.y += dy;
+    if(player.x < 0 || player.x > this.width - player.width || player.y < 0 || player.y > this.height - player.height) {
+      player.x = currentPosition.x;
+      player.y = currentPosition.y;
+    }
     var p = this.checkCollision(player);
     if(p) {
       player.x -= dx;
