@@ -13,7 +13,8 @@
     "connect-mongo": "*",
     "session.socket.io": "*",
     "browserify": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "mongoose": "*"
   },
   "devDependencies": {
     "jasmine-node": "*"
