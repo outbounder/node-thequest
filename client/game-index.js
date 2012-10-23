@@ -71,29 +71,67 @@ socket.on("restart", function(){
 
 var lastKeyDown;
 $(window).on("keydown", function(e){
-  lastKeyDown = e;
+  switch(e.which) {
+    // left
+    case 37:
+      keys.left = 1;
+    break;
+    case 38:
+      keys.top = 1;
+    break;
+    case 40:
+      keys.bottom = 1;
+    break;
+    case 39:
+      keys.right = 1;
+    break;
+  }
 });
 
 $(window).on("keyup", function(e){
-  lastKeyDown = null;
+  switch(e.which) {
+    // left
+    case 37:
+      keys.left = 0;
+    break;
+    case 38:
+      keys.top = 0;
+    break;
+    case 40:
+      keys.bottom = 0;
+    break;
+    case 39:
+      keys.right = 0;
+    break;
+  }
 });
 
+var keys = {
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0
+};
+
 var keyboardInputId = setInterval(function(){
-  if(lastKeyDown) {
-    var e = lastKeyDown;
     var currentPlayer = getPlayerByUsername(user.username);
     if(!currentPlayer) return;
     var dirX = 0;
     var dirY = 0;
-    if(e.keyCode == 37)
+    if(keys.left) {
       dirX = -1;
-    if(e.keyCode == 39)
+    } else if(keys.right) {
       dirX = 1;
-    if(e.keyCode == 40)
-      dirY = 1;
-    if(e.keyCode == 38)
+    } else {
+      dirX = 0;
+    }
+    if(keys.top) {
       dirY = -1;
+    } else if(keys.bottom) {
+      dirY = 1;
+    } else {
+      dirY = 0;
+    }
     if(dirY != 0 || dirX != 0)
       socket.emit("movePlayer", dirX*currentPlayer.speed, dirY*currentPlayer.speed);
-  }
 }, 1000/24);
