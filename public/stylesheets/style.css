@@ -13,12 +13,13 @@ a {
   height: 600px;
   margin: 0 auto;
   border: 1px solid red;
+  position: relative;
 }
 
 .player {
   width: 32px;
   height: 32px;
-  position: fixed;
+  position: absolute;
   border: 1px solid green;
 }
 
