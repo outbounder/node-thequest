@@ -1,5 +1,5 @@
 _ = require("underscore");
-var socket = io.connect('http://localhost');
+var socket = io.connect();
 
 var Player = require("./views/Player");
 var players = [];
