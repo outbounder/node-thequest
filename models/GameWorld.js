@@ -16,6 +16,11 @@ _.extend(module.exports.prototype, {
   timeLeft: 0, // sec
   gameDuration: 30, // sec
   gameTickInterval: 1000, // milis
+  treasuerTimeoutLeft: 0, //milis
+  treasuerTimeout: 1, //sec
+  treasuerTimeoutInterval: 1000, // milis
+  treasureLocked: false,
+
 
   getPlayerByUsername: function(username) {
     return _.find(this.players, function(p){ return p.username == username});
@@ -55,10 +60,11 @@ _.extend(module.exports.prototype, {
     if(p) {
       player.x -= dx;
       player.y -= dy;
-      if(p.hasTreasure || player.hasTreasure) {
+      if((p.hasTreasure || player.hasTreasure) && !this.treasureLocked ) {
         player.hasTreasure = !player.hasTreasure;
         p.hasTreasure = !p.hasTreasure;
         this.io.sockets.emit("treasureTrapped", p, player);
+        this.getTreasureTimeout();        
       }
     }
     this.io.sockets.emit("movePlayer", player);
@@ -106,5 +112,23 @@ _.extend(module.exports.prototype, {
     this.players = [];
     this.io.sockets.emit("restart");
     this.io.sockets.emit("timeLeft", this.timeLeft);
-  }
+  },
+  getTreasureTimeout: function(){
+    if(this.treasureIntervalId)
+      clearInterval(this.treasureIntervalId);
+
+    var self = this;
+    self.treasureLocked = true;
+    self.io.sockets.emit("treasureLocked", self.treasureLocked);    
+    this.treasureIntervalId = setInterval(function(){
+      self.treasuerTimeoutLeft -= 1;
+      if(self.treasuerTimeoutLeft <= 0){ 
+        self.treasureLocked = false;       
+        self.io.sockets.emit("treasureLocked", self.treasureLocked);
+      }
+    }, this.treasuerTimeoutInterval);
+
+    this.treasuerTimeoutLeft = this.treasuerTimeout;
+    this.io.sockets.emit("treasuerTimeout", this.treasuerTimeoutLeft);
+  },
 });
