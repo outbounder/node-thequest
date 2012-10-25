@@ -4,9 +4,43 @@ var rand = function(LowerRange, UpperRange){
   return Math.floor(Math.random() * (UpperRange - LowerRange + 1)) + LowerRange;
 }
 
+var applyGameRules = function (players) {
+  var i, j;
+  for (i = 0; i < players.length; i ++) {
+    var pl = players[i];
+    pl.handleGameAreaCollisions({left: 0, top: 0, right: 800, bottom: 600})
+    for(j = 0; j < players.length; j ++) {
+      pl.handlePlayerCollisions(players[j]);
+    }
+  }
+}
+
 module.exports = function(io){
   this.players = [];
   this.io = io;
+  
+  var that = this;
+  setInterval(function(){
+    //TODO: this must be constant part of GameWorld
+    var gameState = {
+      players: []
+    };
+    
+    for (var i = 0; i < that.players.length; i ++) {
+      var player = that.players[i]
+      gameState.players.push(player.state);
+
+      player.update();
+    }
+    
+    applyGameRules(that.players);
+    
+    that.broadcast("updateGame", gameState);
+    
+    //for (i = 0; i < that.players.length; i ++) {
+    //  that.broadcast("movePlayer", that.players[i].state);
+    //}
+  }, 20);
 }
 
 _.extend(module.exports.prototype, {
@@ -16,72 +50,33 @@ _.extend(module.exports.prototype, {
   timeLeft: 0, // sec
   gameDuration: 30, // sec
   gameTickInterval: 1000, // milis
-
+  
+  broadcast: function (message, data) {
+    this.io.sockets.emit(message, data);
+  },
   getPlayerByUsername: function(username) {
-    return _.find(this.players, function(p){ return p.username == username});
+    return _.find(this.players, function(p){ return p.state.username == username});
   },
 
   addPlayer: function(player) {
-    player.x = rand(0, this.width);
-    player.y = rand(0, this.height);
-    while(this.checkCollision(player)) {
-      player.x = rand(0, this.width);
-      player.y = rand(0, this.height);
-    }
-    if(this.players.length == 0)
-      player.hasTreasure = true;
     this.players.push(player);
-    this.io.sockets.emit("addPlayer", player);
+    var state = player.state;
+    state.x = rand(0, this.width);
+    state.y = rand(0, this.height);
+    if(this.players.length == 1)//this is the first player
+      state.hasTreasure = true;
+    this.broadcast("addPlayer", state);
   },
   removePlayer: function(player) {
     this.players.splice(this.players.indexOf(player), 1);
-    this.io.sockets.emit("removePlayer", player);
-    if(player.hasTreasure && this.players.length > 0) {
-      player.hasTreasure = false;
+    
+    var state = player.state;
+    this.broadcast("removePlayer", state);
+    if(state.hasTreasure && this.players.length > 0) {
+      state.hasTreasure = false;
       p = this.players[rand(0,this.players.length-1)];
-      p.hasTreasure = true;
-      this.io.sockets.emit("treasureTrapped", p);
-    }
-  },
-  movePlayer: function(player, dx, dy) {
-    player.x += dx;
-    player.y += dy;
-    var p = this.checkCollision(player);
-    if(p) {
-      player.x -= dx;
-      player.y -= dy;
-      if(p.hasTreasure || player.hasTreasure) {
-        player.hasTreasure = !player.hasTreasure;
-        p.hasTreasure = !p.hasTreasure;
-        this.io.sockets.emit("treasureTrapped", p, player);
-      }
-    }
-    this.io.sockets.emit("movePlayer", player);
-  },
-  checkCollision: function(player) {
-    var playerRight = player.x+player.width;
-    var playerBottom = player.y+player.height;
-
-    for(var i = 0; i<this.players.length; i++) {
-      if(player.username == this.players[i].username) continue;
-      var p = this.players[i];
-      var pRight = p.x+p.width;
-      var pBottom = p.y+p.height;
-      if(
-
-        (p.x >= player.x && p.x <= playerRight && 
-        p.y >= player.y && p.y <= playerBottom) || 
-
-        (pRight >= player.x && pRight <= playerRight && 
-        p.y >= player.y && p.y <= playerBottom) ||
-
-        (pRight >= player.x && pRight <= playerRight && 
-        pBottom >= player.y && pBottom <= playerBottom) ||
-        
-        (p.x > player.x && p.x < playerRight && 
-        pBottom >= player.y && pBottom <= playerBottom)
-      )
-        return p;
+      p.state.hasTreasure = true;
+      this.broadcast("treasureTrapped", p.state);
     }
   },
   restart: function(){
@@ -94,12 +89,12 @@ _.extend(module.exports.prototype, {
       if(self.timeLeft < 0)
         self.restart();
       else
-        self.io.sockets.emit("timeLeft", self.timeLeft);
+        self.broadcast("timeLeft", self.timeLeft);
     }, this.gameTickInterval);
 
     this.timeLeft = this.gameDuration;
     this.players = [];
-    this.io.sockets.emit("restart");
-    this.io.sockets.emit("timeLeft", this.timeLeft);
+    this.broadcast("restart");
+    this.broadcast("timeLeft", this.timeLeft);
   }
 });

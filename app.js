@@ -60,6 +60,7 @@ db.once("open", function(){
     console.log("Express server listening on port " + app.get('port'));
 
     var io = socketio.listen(server);
+    io.set("log level", 0);
     var sio = new SessionSockets(io, sessionStore, cookieParser);
 
     var game = new GameWorld(io);
@@ -79,12 +80,13 @@ db.once("open", function(){
           socket.emit("players", game.players);
         });
       });
-      socket.on("removePlayer", function(){
-        game.removePlayer(socket.player);
+      //socket.on("removePlayer", function(){
+      //  game.removePlayer(socket.player);
+      //});
+      socket.on("directionChange", function(isSet, dir){
+        socket.player.direction[dir] = isSet;
       });
-      socket.on("movePlayer", function(dx, dy){
-        game.movePlayer(socket.player, dx, dy);
-      });
+      
       socket.on("disconnect", function(){
         if(socket.player)
           game.removePlayer(socket.player);
