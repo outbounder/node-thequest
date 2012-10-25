@@ -9,6 +9,9 @@ module.exports = function(io){
   this.io = io;
 }
 
+//Browser Dimensions
+
+
 _.extend(module.exports.prototype, {
   players: null,
   width: 800, // px
@@ -46,6 +49,32 @@ _.extend(module.exports.prototype, {
   movePlayer: function(player, dx, dy) {
     player.x += dx;
     player.y += dy;
+    
+    /*** Reset ***/
+
+    /*** X ***/
+    if (player.x < 0)
+    {
+      player.x = 0;
+    }
+    if (player.x > (this.width - player.width))
+    {
+      player.x = 800 - player.width;
+    }
+    /*** X ***/
+    
+    /*** Y ***/
+    if (player.y < 0)
+    {
+      player.y = 0;
+    }
+    if (player.y > (this.height - player.height))
+    {
+      player.y = this.height - player.height;
+    }   
+    /*** Y ***/ 
+    /*** Reset ***/
+   
     var p = this.checkCollision(player);
     if(p) {
       player.x -= dx;
