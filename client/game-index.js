@@ -42,6 +42,10 @@ socket.on("treasureLocked", function(treasureLocked){
   }  
 });
 
+socket.on("debugInfo", function(debugInfo){
+  $(".debugInfo").append('<div>'+debugInfo+'</div>');
+});
+
 socket.on("connect", function(){
   socket.emit("addPlayer");
 });

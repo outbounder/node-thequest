@@ -14,12 +14,13 @@ _.extend(module.exports.prototype, {
   width: 800, // px
   height: 600, // px
   timeLeft: 0, // sec
-  gameDuration: 30, // sec
+  gameDuration: 5, // sec
   gameTickInterval: 1000, // milis
   treasuerTimeoutLeft: 0, //milis
   treasuerTimeout: 1, //sec
   treasuerTimeoutInterval: 1000, // milis
   treasureLocked: false,
+  offset: 1, //margins and borders
 
 
   getPlayerByUsername: function(username) {
@@ -27,11 +28,13 @@ _.extend(module.exports.prototype, {
   },
 
   addPlayer: function(player) {
-    player.x = rand(0, this.width);
-    player.y = rand(0, this.height);
+    var playArea_width = this.getPlayMaxWidth(player);                          
+    var playArea_height = this.getPlayMaxHeight(player);                                             
+    player.x = rand(0, playArea_width);
+    player.y = rand(0, playArea_height);    
     while(this.checkCollision(player)) {
-      player.x = rand(0, this.width);
-      player.y = rand(0, this.height);
+      player.x = rand(0, playArea_width);
+      player.y = rand(0, playArea_height); 
     }
     if(this.players.length == 0)
       player.hasTreasure = true;
@@ -52,10 +55,18 @@ _.extend(module.exports.prototype, {
     var currentPosition = {x: player.x, y: player.y};
     player.x += dx;
     player.y += dy;
+    var playArea_width = this.getPlayMaxWidth(player);                          
+    var playArea_height = this.getPlayMaxHeight(player); 
+    if(player.x < 0) player.x = 0;
+    if(player.x > playArea_width) player.x = playArea_width;
+    if(player.y < 0) player.y = 0;
+    if(player.y > playArea_height) player.y = playArea_height;
+    /*
     if(player.x < 0 || player.x > this.width - player.width || player.y < 0 || player.y > this.height - player.height) {
       player.x = currentPosition.x;
       player.y = currentPosition.y;
     }
+    */
     var p = this.checkCollision(player);
     if(p) {
       player.x -= dx;
@@ -123,12 +134,24 @@ _.extend(module.exports.prototype, {
     this.treasureIntervalId = setInterval(function(){
       self.treasuerTimeoutLeft -= 1;
       if(self.treasuerTimeoutLeft <= 0){ 
-        self.treasureLocked = false;       
+        self.treasureLocked = false;   
         self.io.sockets.emit("treasureLocked", self.treasureLocked);
       }
     }, this.treasuerTimeoutInterval);
 
     this.treasuerTimeoutLeft = this.treasuerTimeout;
     this.io.sockets.emit("treasuerTimeout", this.treasuerTimeoutLeft);
-  },
+  },  
+  getPlayMaxWidth: function(player){
+    return this.width
+          - player.width
+          - player.offset
+          - this.offset;  
+  },  
+  getPlayMaxHeight: function(player){
+    return this.height
+          - player.height
+          - player.offset
+          - this.offset;  
+  }, 
 });

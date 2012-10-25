@@ -6,5 +6,6 @@ module.exports = function(user){
   this.width = 32;
   this.height = 32;
   this.speed = 10;
+  this.offset = 1; // borders+margins
 }
 
