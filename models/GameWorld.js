@@ -14,7 +14,7 @@ _.extend(module.exports.prototype, {
   width: 800, // px
   height: 600, // px
   timeLeft: 0, // sec
-  gameDuration: 5, // sec
+  gameDuration: 30, // sec
   gameTickInterval: 1000, // milis
   treasuerTimeoutLeft: 0, //milis
   treasuerTimeout: 1, //sec
