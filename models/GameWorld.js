@@ -5,7 +5,11 @@ var rand = function(LowerRange, UpperRange){
 }
 
 var applyGameRules = function (players) {
+  //TODO: use forEach... in next revision :)
   var i, j;
+  for (i = 0; i < players.length; i ++) {
+    players[i].update();
+  }
   for (i = 0; i < players.length; i ++) {
     var pl = players[i];
     pl.handleGameAreaCollisions({left: 0, top: 0, right: 800, bottom: 600})
@@ -20,27 +24,20 @@ module.exports = function(io){
   this.io = io;
   
   var that = this;
-  setInterval(function(){
-    //TODO: this must be constant part of GameWorld
-    var gameState = {
-      players: []
-    };
-    
-    for (var i = 0; i < that.players.length; i ++) {
-      var player = that.players[i]
-      gameState.players.push(player.state);
-
-      player.update();
-    }
-    
+  
+  var gameCycle = function(){
     applyGameRules(that.players);
-    
-    that.broadcast("updateGame", gameState);
-    
-    //for (i = 0; i < that.players.length; i ++) {
-    //  that.broadcast("movePlayer", that.players[i].state);
-    //}
-  }, 20);
+    that.broadcast("updateGame", that.getGameState());
+    /* 
+     * Use Timeout instead of Interval to ensure that the computer has its time to finish calculations. 
+     * Using setInterval can lead to multiple gameCycle invokation waiting in the queue for execution 
+     * and lead to possible errors when working with non-block operations
+     */
+    setTimeout(gameCycle, 20); 
+  };
+  
+  //init:
+  gameCycle();
 }
 
 _.extend(module.exports.prototype, {
@@ -96,5 +93,16 @@ _.extend(module.exports.prototype, {
     this.players = [];
     this.broadcast("restart");
     this.broadcast("timeLeft", this.timeLeft);
+  },
+  getGameState: function () {
+    var gameState = {
+      players: []
+    };
+    
+    for (var i = 0; i < this.players.length; i ++) {
+      gameState.players.push(this.players[i].state);
+    }
+    
+    return gameState;
   }
 });

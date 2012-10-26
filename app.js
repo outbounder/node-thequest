@@ -71,20 +71,18 @@ db.once("open", function(){
     sio.on("connection", function(err, socket, session){
       io.clientsCount += 1;
       io.sockets.emit("visitorsOnline", io.clientsCount);
+      
       socket.on("addPlayer", function(){
         if(!session.userId) return;
         User.findById(session.userId, function(err, user){
           if(err) return console.log(err);
           socket.player = new Player(user);
           game.addPlayer(socket.player);
-          socket.emit("players", game.players);
+	  socket.on("directionChange", function(isSet, dir){
+	    socket.player.direction[dir] = isSet;
+	  });
+          socket.emit("players", game.getGameState());
         });
-      });
-      //socket.on("removePlayer", function(){
-      //  game.removePlayer(socket.player);
-      //});
-      socket.on("directionChange", function(isSet, dir){
-        socket.player.direction[dir] = isSet;
       });
       
       socket.on("disconnect", function(){

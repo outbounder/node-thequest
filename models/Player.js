@@ -20,24 +20,17 @@ module.exports = function(user){
     , y: 0
   }
   
+  var DIMENSIONS = { x: 32, y: 32 };
   var ACCELERATION = 3;
-  var DECCELERATION = 5;
-  var MAX_SPEED = 30;
+  var DECCELERATION = 1;
+  var MAX_SPEED = 20;
   var changeAcceleration = function (dir, coef, pressed) {
-    
     var val = acceleration[dir] * coef;
-    if (val > 0) { //moving in that direction
-      if (pressed) { //pressing in that direction
-	if (val < MAX_SPEED) {
-	  acceleration[dir] = (val + ACCELERATION) * coef;
-	}
-      } else { //moving, but not pressing - stopping
-	acceleration[dir] = Math.max(val - DECCELERATION, 0) * coef;
-      }
-    } else {
-      if (pressed) {
-	acceleration[dir] = (val + ACCELERATION) * coef;
-      }
+    if (val > 0 && !pressed) { //moving in that direction and not pressing - stopping
+      acceleration[dir] = Math.max(val - DECCELERATION, 0) * coef;
+    }
+    if (pressed && val < MAX_SPEED) { //apply acceleration
+      acceleration[dir] = Math.min(MAX_SPEED, (val + ACCELERATION)) * coef;
     }
   }
   
@@ -95,26 +88,108 @@ module.exports = function(user){
     this.state[attr] = this.state[attr] + shift * coef;
     acceleration[attr] = Math.abs(acceleration[attr]) * coef;
   }
+    
+  var distanceOfImpact = function (dir, player1, player2) {
+    //calculate direction of impact
+    // - 1 player 1 was hit from lower, 0 - equal speeds, no direction on dir, +1 - player1 was hit from higher
+    var directionOfImpact = compare(player1.acc()[dir], player2.acc()[dir]); 
+    /*
+     * Let player 2 be hitting from right, player1 from left
+     * player1.acc > player2.acc, therefore directionOfImpact = +1
+     * (player2 absolute x position - player1 absolute x position) * +1 - how close positions of players are, if value is negative they swap places
+     * - width -> results in negative value equal to the number of points they traveled after collision.
+     */
+    var distanceToImpact = ((player2.state[dir] - player1.state[dir]) * directionOfImpact - DIMENSIONS[dir]);
+    return -distanceToImpact;
+  };
   
   var compare = function (a, b) {
+    if (a === b) return 0; // prevent 0/0 as it is not 0, but NaN
     return (a - b) / Math.abs(a - b);
   }
+  
+  var speedOfImpact = function (dir, acc1, acc2) {
+    var a = acc1[dir]
+    , b = acc2[dir];
+    /*
+     let a > b in the following examples:
+     if b >= 0, a > 0 -> a chases b, speed is a - b
+     if a >= 0, b < 0 -> a speeds against b, speed is a + (-b) -> a - b
+     if a < 0, b < 0 -> b chases a towards -Infinity, speed is (-b) - (-a) -> a - b
+       
+     Therefore speed of impact on a given direction is the higherValue - lowerValue:
+    */
+    return Math.max(a, b) - Math.min(a, b);
+  };
+  
+  var calcTimeOfImpact = function (dir, player1, player2) {
+    var speed = speedOfImpact(dir, player1.acc(), player2.acc());
+    if (speed == 0) return 1; //instead of Infinity
+    return distanceOfImpact(dir, player1, player2) / speed;
+  };
   
   this.handlePlayerCollisions = function (player) {
     if (player == this)
       return;
     var dist = this.getDistance(player);
-    var tmp;
-    if (isCollision(dist)) {
-      //TODO: Realistic physics
-      thisXSign = compare(this.state.x, player.state.x) || -1; //never use 0
-      this.changeDirection("x", thisXSign, - dist.x);
-      player.changeDirection("x", -thisXSign, - dist.x);
-      thisYSign = compare(this.state.y, player.state.y) || -1;
-      this.changeDirection("y", thisYSign, - dist.y);
-      player.changeDirection("y", -thisYSign, - dist.y);
+    if (this.isColliding(player)) {
+      //resolve collision
+     
+      //calculate time of impact
+      var timeOfImpact = Math.min(
+	  calcTimeOfImpact("x", this, player)
+	  , calcTimeOfImpact("y", this, player)
+      );
+      
+      //revert time to time of impact
+      this.moveTime(-timeOfImpact);
+      player.moveTime(-timeOfImpact);
+    
+      //swap accelerations
+      var tmp = this.acc();
+      this.acc(player.acc());
+      player.acc(tmp);
+      
+      //move with time of impact
+      this.moveTime(timeOfImpact);
+      player.moveTime(timeOfImpact);
+      
+      //if it is still colliding just go once more
+      while(this.isColliding(player)) {
+	//in case we have a unit blocked at a wall and another colliding with it they get stuck. 
+	//This should resolve the issue
+	if (acceleration.x === 0 && acceleration.y === 0) {
+	  acceleration.x = Math.round(Math.random()*5);
+	  acceleration.y = Math.round(Math.random()*5);
+	}
+	//just run away
+	this.moveTime(1);
+      }
+      
+      //swap treasure owner
+      tmp = this.state.hasTreasure;
+      this.state.hasTreasure = player.state.hasTreasure;
+      player.state.hasTreasure = tmp;
+      
     }
   }
+  
+  var roundFurther = function (value) {
+    return (value >= 0) ? Math.ceil(value): Math.floor(value);
+  }
+  
+  this.moveTime = function(time, fn) {
+    this.state.x += roundFurther(acceleration.x * time);
+    this.state.y += roundFurther(acceleration.y * time);
+  }
+  
+  this.acc = function (arg) {
+    if (typeof arg !== "undefined") {
+      acceleration = arg;
+    } else {
+      return acceleration;
+    }
+  };
 }
 
 

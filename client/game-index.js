@@ -38,7 +38,8 @@ socket.on("addPlayer", function(playerData){
   addOrUpdate(playerData);
 });
 
-socket.on("players", function(playersData){
+socket.on("players", function(gameState){
+  var playersData = gameState.players;
   for(var i = 0; i<playersData.length; i++) {
     var playerData = playersData[i];
     addOrUpdate(playerData);   
