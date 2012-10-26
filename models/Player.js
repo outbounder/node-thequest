@@ -154,16 +154,30 @@ module.exports = function(user){
       this.moveTime(timeOfImpact);
       player.moveTime(timeOfImpact);
       
-      //if it is still colliding just go once more
+      if(this.isColliding(player)) {
+	//just run away
+	player.moveTime(1);
+	this.moveTime(1);
+      }
+      
+      //and if it is still colliding just go until we find a way out
       while(this.isColliding(player)) {
 	//in case we have a unit blocked at a wall and another colliding with it they get stuck. 
-	//This should resolve the issue
-	if (acceleration.x === 0 && acceleration.y === 0) {
-	  acceleration.x = Math.round(Math.random()*5);
-	  acceleration.y = Math.round(Math.random()*5);
+	//This should resolve the issue. But keep in mind this is buggy behavior
+	if (this.isStill() || player.isStill()) {
+	  var newAcc = { 
+	    x: Math.round(Math.random()*5)
+	    , y: Math.round(Math.random()*5)
+	  }
+	  //go in opposite directions
+	  this.acc(newAcc)
+	  player.acc({x: -newAcc.x, y: -newAcc.y});
 	}
-	//just run away
-	this.moveTime(1);
+	
+	for (var retry = 0; retry < 10 && this.isColliding(player); retry ++) {
+	  player.moveTime(1);
+	  this.moveTime(1);
+	}
       }
       
       //swap treasure owner
@@ -181,6 +195,10 @@ module.exports = function(user){
   this.moveTime = function(time, fn) {
     this.state.x += roundFurther(acceleration.x * time);
     this.state.y += roundFurther(acceleration.y * time);
+  }
+  
+  this.isStill = function () {
+    return acceleration.x === 0 && acceleration.y === 0;
   }
   
   this.acc = function (arg) {
