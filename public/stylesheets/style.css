@@ -8,6 +8,12 @@ a {
   color: #00B7FF;
 }
 
+.name {
+  position: absolute;
+  top: 36px;
+  left: 3px;
+}
+
 .gameWorld {
   width: 800px;
   height: 600px;
@@ -17,11 +23,16 @@ a {
 
 .player {
   width: 32px;
-  height: 32px;
+  height: 33px;
   position: fixed;
-  border: 1px solid green;
+  background: url('/pacman.png') top left no-repeat;
 }
 
-.player.hasTreasure {
-  background-color: red;
+.coin {
+  display: none;
+  width: 32px;
+  height: 32px;
+  background: url('/coin.png') top left no-repeat;
+  position: absolute;
+  left: 25px;
 }
