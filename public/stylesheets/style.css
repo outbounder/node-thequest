@@ -20,14 +20,13 @@ a {
   margin: 0 auto;
   border: 1px solid red;
   position: relative;
-  top: -160px;
-  left: 0;
 }
 
 .player {
   width: 32px;
   height: 33px;
   position: absolute;
+  border: 1px solid green;
   background: url('/pacman.png') top left no-repeat;
 }
 
