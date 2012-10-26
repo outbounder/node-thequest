@@ -154,37 +154,42 @@ module.exports = function(user){
       this.moveTime(timeOfImpact);
       player.moveTime(timeOfImpact);
       
-      if(this.isColliding(player)) {
-	//just run away
-	player.moveTime(1);
-	this.moveTime(1);
-      }
-      
-      //and if it is still colliding just go until we find a way out
-      while(this.isColliding(player)) {
-	//in case we have a unit blocked at a wall and another colliding with it they get stuck. 
-	//This should resolve the issue. But keep in mind this is buggy behavior
-	if (this.isStill() || player.isStill()) {
-	  var newAcc = { 
-	    x: Math.round(Math.random()*5)
-	    , y: Math.round(Math.random()*5)
-	  }
-	  //go in opposite directions
-	  this.acc(newAcc)
-	  player.acc({x: -newAcc.x, y: -newAcc.y});
-	}
-	
-	for (var retry = 0; retry < 10 && this.isColliding(player); retry ++) {
-	  player.moveTime(1);
-	  this.moveTime(1);
-	}
-      }
+      this.ensureCollisionIsResolved(player);
       
       //swap treasure owner
       tmp = this.state.hasTreasure;
       this.state.hasTreasure = player.state.hasTreasure;
       player.state.hasTreasure = tmp;
       
+    }
+  }
+  
+  this.ensureCollisionIsResolved = function (player) {
+    //just run away
+    if(this.isColliding(player)) { 
+      player.moveTime(1);
+      this.moveTime(1);
+    }
+    
+    //and if it is still colliding just go until we find a way out
+    while(this.isColliding(player)) {
+      console.log("things got f*cked up");
+      //in case we have a unit blocked at a wall and another colliding non-stop with it they get stuck. 
+      //This should resolve the issue. But keep in mind this is buggy behavior
+      if (this.isStill() || player.isStill()) {
+	var newAcc = { 
+	  x: Math.round(Math.random()*5)
+	  , y: Math.round(Math.random()*5)
+	}
+	//go in opposite directions
+	this.acc(newAcc)
+	player.acc({x: -newAcc.x, y: -newAcc.y});
+      }
+      
+      for (var retry = 0; retry < 10 && this.isColliding(player); retry ++) {
+	player.moveTime(1);
+	this.moveTime(1);
+      }
     }
   }
   
