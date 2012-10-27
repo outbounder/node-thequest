@@ -1,0 +1,10 @@
+{
+  "mongoose": {
+    "hostname": "localhost",
+    "port": 27017,
+    "db": "node-thequest"
+  },
+  "MongoStore": {
+    "db": "node-thequest"
+  }
+}
