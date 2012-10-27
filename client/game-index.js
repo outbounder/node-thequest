@@ -4,14 +4,14 @@ var socket = io.connect();
 var Player = require("./views/Player");
 var players = [];
 
-var getPlayerByUsername = function(username){
+var getPlayerById = function(playerId){
   for(var i = 0; i<players.length; i++)
-    if(players[i].username == username)
+    if(players[i].playerId == playerId)
       return players[i];
 }
 
 var addOrUpdate = function(playerData){
-  var player = getPlayerByUsername(playerData.username);
+  var player = getPlayerById(playerData.playerId);
   if(!player) {
     player = new Player(playerData)
     players.push(player);
@@ -26,51 +26,32 @@ socket.on('visitorsOnline', function (data) {
   $(".visitorsCount").html(data);
 });
 
-socket.on("timeLeft", function(timeLeft){
-  $(".timeLeft").html("Time left:"+timeLeft);
-});
-
-socket.on("connect", function(){
-  socket.emit("addPlayer");
+socket.on("registered", function(){
+  socket.emit("addPlayer");  
 });
 
 socket.on("addPlayer", function(playerData){
   addOrUpdate(playerData);
 });
 
-socket.on("players", function(gameState){
-  var playersData = gameState.players;
-  for(var i = 0; i<playersData.length; i++) {
-    var playerData = playersData[i];
-    addOrUpdate(playerData);   
-  }
-});
-
 socket.on("removePlayer", function(playerData){
-  var p = getPlayerByUsername(playerData.username);
+  var p = getPlayerById(playerData.playerId);
   players.splice(players.indexOf(p), 1);
   p.remove();
 });
 
-
-var movePlayer = function(playerData){
-  var player = getPlayerByUsername(playerData.username);
-  _.extend(player, playerData);
-  player.render();
-};
-
-socket.on("movePlayer", movePlayer);
 socket.on("updateGame", function (gameState) {
+  $(".timeLeft").html("Time left:"+gameState.timeLeft);
   //expect playerStates to be an array
   for (var i = 0; i < gameState.players.length; i ++) {
-    movePlayer(gameState.players[i]);
+    addOrUpdate(gameState.players[i]);
   }
 });
 
 socket.on("treasureTrapped", function(p1Data, p2Data){
-  _.extend(getPlayerByUsername(p1Data.username), p1Data).render();
+  _.extend(getPlayerById(p1Data.playerId), p1Data).render();
   if(p2Data)
-    _.extend(getPlayerByUsername(p2Data.username), p2Data).render();
+    _.extend(getPlayerById(p2Data.playerId), p2Data).render();
 })
 
 socket.on("restart", function(){

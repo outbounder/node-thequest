@@ -1,4 +1,8 @@
-module.exports = function(user){
+var _ = require("underscore");
+
+module.exports = function(user, socket){
+  this.socket = socket;
+
   this.state = { 
     username: user.username
     , hasTreasure: false
@@ -6,6 +10,7 @@ module.exports = function(user){
     , y: 0
     , width: 32
     , height: 32
+    , playerId: _.uniqueId()
   };
   
   this.direction = {

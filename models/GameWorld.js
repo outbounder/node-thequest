@@ -49,20 +49,18 @@ _.extend(module.exports.prototype, {
   gameTickInterval: 1000, // milis
   
   broadcast: function (message, data) {
-    this.io.sockets.emit(message, data);
-  },
-  getPlayerByUsername: function(username) {
-    return _.find(this.players, function(p){ return p.state.username == username});
+    for (var i = this.players.length - 1; i >= 0; i--) {
+      this.players[i].socket.emit(message, data);
+    };
   },
 
   addPlayer: function(player) {
-    this.players.push(player);
     var state = player.state;
     state.x = rand(0, this.width);
     state.y = rand(0, this.height);
-    if(this.players.length == 1)//this is the first player
-      state.hasTreasure = true;
+    state.hasTreasure = this.players.length == 0;
     this.broadcast("addPlayer", state);
+    this.players.push(player);
   },
   removePlayer: function(player) {
     this.players.splice(this.players.indexOf(player), 1);
@@ -85,18 +83,16 @@ _.extend(module.exports.prototype, {
       self.timeLeft -= 1;
       if(self.timeLeft < 0)
         self.restart();
-      else
-        self.broadcast("timeLeft", self.timeLeft);
     }, this.gameTickInterval);
 
     this.timeLeft = this.gameDuration;
     this.players = [];
-    this.broadcast("restart");
-    this.broadcast("timeLeft", this.timeLeft);
+    this.io.sockets.emit("restart");
   },
   getGameState: function () {
     var gameState = {
-      players: []
+      players: [],
+      timeLeft: this.timeLeft
     };
     
     for (var i = 0; i < this.players.length; i ++) {
