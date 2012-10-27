@@ -2,6 +2,12 @@ extends layout
 
 block content
   h1= title
+  div.nav
+    a(href='/game') game | 
+    a(href='/users/register') register | 
+    a(href='/users/login') login 
+    br
+    br
   span.visitorsTitle Visitors:
   span.visitorsCount= 0
   script.
