@@ -4,23 +4,14 @@ var socket = io.connect();
 var Player = require("./views/Player");
 var players = [];
 
-var getPlayerByUsername = function(username){
-  for(var i = 0; i<players.length; i++)
-    if(players[i].username == username)
-      return players[i];
-}
+var PlayersCollection = require("./collections/PlayersCollection");
+var playersCollection = new PlayersCollection();
 
-var addOrUpdate = function(playerData){
-  var player = getPlayerByUsername(playerData.username);
-  if(!player) {
-    player = new Player(playerData)
-    players.push(player);
-    $(".gameWorld").append(player.render().$el);
-  } else {
-    _.extend(player, playerData);
-    player.render();
-  }
-}
+var WorldView = require("./views/WorldView");
+var World = new WorldView({
+  el:".gameWorld",
+  collection: playersCollection
+}).render();
 
 socket.on('visitorsOnline', function (data) {
   $(".visitorsCount").html(data);
@@ -35,28 +26,27 @@ socket.on("connect", function(){
 });
 
 socket.on("addPlayer", function(playerData){
-  addOrUpdate(playerData);
+  if(World.collection.get(playerData.username))
+    World.collection.add(playerData);
+  else
+    World.collection.add(playerData);
 });
 
 socket.on("players", function(gameState){
   var playersData = gameState.players;
   for(var i = 0; i<playersData.length; i++) {
     var playerData = playersData[i];
-    addOrUpdate(playerData);   
+    playersCollection.add(playerData);
   }
 });
 
 socket.on("removePlayer", function(playerData){
-  var p = getPlayerByUsername(playerData.username);
-  players.splice(players.indexOf(p), 1);
-  p.remove();
+  playersCollection.get(playerData.username).remove();
 });
 
 
 var movePlayer = function(playerData){
-  var player = getPlayerByUsername(playerData.username);
-  _.extend(player, playerData);
-  player.render();
+  playersCollection.get(playerData.username).set(playerData);
 };
 
 socket.on("movePlayer", movePlayer);
@@ -68,14 +58,13 @@ socket.on("updateGame", function (gameState) {
 });
 
 socket.on("treasureTrapped", function(p1Data, p2Data){
-  _.extend(getPlayerByUsername(p1Data.username), p1Data).render();
+  playersCollection.get(p1Data).set(p1Data);
   if(p2Data)
-    _.extend(getPlayerByUsername(p2Data.username), p2Data).render();
+    playersCollection.get(p2Data).set(p2Data);
 })
 
 socket.on("restart", function(){
-  $(".player").remove();
-  players = [];
+  playersCollection.reset();
   socket.emit("addPlayer");
 });
 

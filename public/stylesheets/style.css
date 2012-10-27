@@ -28,10 +28,10 @@ a {
   position: absolute;
   border: 1px solid green;
   background: url('/pacman.png') top left no-repeat;
+  display:block;
 }
 
 .coin {
-  display: none;
   width: 32px;
   height: 32px;
   background: url('/coin.png') top left no-repeat;
