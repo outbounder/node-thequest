@@ -183,8 +183,8 @@ module.exports = function(user, socket){
       //This should resolve the issue. But keep in mind this is buggy behavior
       if (this.isStill() || player.isStill()) {
 	var newAcc = { 
-	  x: Math.round(Math.random()*5)
-	  , y: Math.round(Math.random()*5)
+	  x: Math.round(Math.random()*30)
+	  , y: Math.round(Math.random()*30)
 	}
 	//go in opposite directions
 	this.acc(newAcc)
