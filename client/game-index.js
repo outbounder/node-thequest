@@ -1,4 +1,4 @@
-_ = require("underscore");
+_ = require("./vendor/underscore");
 var socket = io.connect();
 
 var Player = require("./views/Player");
