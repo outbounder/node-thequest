@@ -10,7 +10,7 @@ a {
 
 .name {
   position: absolute;
-  top: 36px;
+  top: -10px;
   left: 3px;
 }
 
@@ -26,8 +26,8 @@ a {
   width: 32px;
   height: 33px;
   position: absolute;
-  border: 1px solid green;
   background: url('/pacman.png') top left no-repeat;
+  background-size: 100%;
   display:block;
 }
 
@@ -36,6 +36,7 @@ a {
   width: 32px;
   height: 32px;
   background: url('/coin.png') top left no-repeat;
+  background-size: 100%;
   position: absolute;
-  left: 25px;
+  left: 60%;
 }

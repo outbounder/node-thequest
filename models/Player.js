@@ -73,7 +73,6 @@ module.exports = function(user){
     //actually change position
     this.state.x += acceleration.x;
     this.state.y += acceleration.y;
-    console.log(this.state.z, this.direction.jump, acceleration.z) ;
     this.state.z = jump(this.direction.jump, this.state.z);
   }
  

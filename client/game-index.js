@@ -21,7 +21,6 @@ socket.on("connect", function(){
 });
 
 socket.on("addPlayer", function(playerData){
-    console.log("<addPlayer>",playerData);
     World.collection.add(playerData);
 });
 

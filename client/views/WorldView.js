@@ -10,6 +10,8 @@ module.exports = WorldView = Backbone.View.extend({
   
   initialize: function(options){
     this.views = [];
+    this.setViewDimensions();
+    this.focus = {x:400,y:300};
     
     var self = this;
     this.collection.each(function(model){
@@ -53,18 +55,26 @@ module.exports = WorldView = Backbone.View.extend({
   },
 
   updateOne:function(view){
-    view.$el.css(this.modelPointToScreen(view.model));
+    var dimensions = this.modelPointToScreen(view.model);
+    view.$el.css(dimensions);
+    view.$(".coin").css({"width":dimensions["width"], "height":dimensions["height"]})
   },
 
   modelPointToScreen: function (model){
     var z = model.get('z')/64;
-    var result = {
-      "left":  -model.get('x') / (z - this.zoom),
-      "top":  -model.get('y') / (z - this.zoom),
-      "width": model.get('width')/(this.zoom - z),
-      "height": model.get('height')/(this.zoom - z)
+    var width = model.get('width')/(this.zoom - z);
+    var height =  model.get('height')/(this.zoom - z);
+    return {
+      "left":  this.width+model.get('width')/2+((this.focus.x-model.get('x')) / (z - this.zoom) - this.width/2 - width / 2),
+      "top":  this.height+model.get('height')/2+((this.focus.y-model.get('y')) / (z - this.zoom) - this.height/2 - height / 2),
+      "width": width,
+      "height": height
     };
-    console.log(z);
-    return result;
-  }
+  },
+
+  setViewDimensions: function(){
+      this.width = parseInt(this.$el.css("width").slice(0,-2));
+      this.height = parseInt(this.$el.css("height").slice(0,-2));
+      this.offset = this.$el.offset();
+    },
 });
