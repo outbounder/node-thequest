@@ -1,57 +1,84 @@
 module.exports = WorldView = Backbone.View.extend({
 
   PlayerView:require("./PlayerView"),
+  MapElementView:require("./MapElementView"),
 
   collection:null,
+  mapCollection: null,
 
   width: null,
   height: null,
   zoom: 1,
   
   initialize: function(options){
-    this.views = [];
-    this.setViewDimensions();
+    this.players = [];
+    this.platforms = [];
     this.focus = {x:400,y:300};
+    this.mapCollection = options.mapCollection;
+
+    this.setViewDimensions();
+    this.renderPlayers();
     
     var self = this;
-    this.collection.each(function(model){
-      self.createView(model);
-    });
-
     this.collection.on("add", function(model){
-      self.createView(model);
-    });
+      var view = self.createView(model, self.PlayerView);
+      self.players.push(view);
+      view.on("remove", function(view){
+        self.players.splice(self.players.indexOf(view), 1);
+      });
+    })
+    .on("reset", this.reset, this);
 
-    this.collection.on("reset", this.reset, this);
+    this.mapCollection.on("reset", this.renderMap, this);
   },
 
-  render: function(options){
+  render: function(){
     this.updateAll();
     return this;
   },
 
-  reset: function(){
-    this.views.forEach(function(view){
-      view.remove();
+  renderMap: function(){
+    var self = this;
+    this.mapCollection.each(function(object){
+      var view = self.createView(object, self.MapElementView);
+      self.platforms.push(view);
+      view.on("remove", function(view){
+        self.platforms.splice(self.players.indexOf(view), 1);
+      });
     });
-    this.views = [];
-    this.$el.empty();
   },
 
-  createView:function(model){
-    var view = new this.PlayerView({model:model})
+  renderPlayers: function(){
+    var self = this;
+    this.collection.each(function(model){
+      var view = self.createView(model, self.PlayerView);
+      self.players.push(view);
+      view.on("remove", function(view){
+        self.players.splice(self.players.indexOf(view), 1);
+      });
+    });
+  },
+
+  reset: function(){
+    this.players.forEach(function(view){
+      view.remove();
+    });
+    this.players = [];
+  },
+
+  createView:function(model, viewPrototype){
+    var view = new viewPrototype({model:model})
       .render()
       .on("change", this.updateOne, this);
-    view.trigger("change", view);
-
-    this.views.push(view);
+    this.updateOne(view);
     this.$el.append(view.$el);
+    return view;
   },
 
   updateAll: function(){
     var self = this;
-    this.views.forEach(function(view){self.updateOne(view)});
-    //this.terrain.forEach....
+    this.players.forEach(function(view){self.updateOne(view)});
+    this.platforms.forEach(function(view){self.updateOne(view)});
   },
 
   updateOne:function(view){
@@ -68,7 +95,8 @@ module.exports = WorldView = Backbone.View.extend({
       "left":  this.width+model.get('width')/2+((this.focus.x-model.get('x')) / (z - this.zoom) - this.width/2 - width / 2),
       "top":  this.height+model.get('height')/2+((this.focus.y-model.get('y')) / (z - this.zoom) - this.height/2 - height / 2),
       "width": width,
-      "height": height
+      "height": height,
+      "z-index": Math.round(z*100)
     };
   },
 

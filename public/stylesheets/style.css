@@ -40,3 +40,7 @@ a {
   position: absolute;
   left: 60%;
 }
+
+.mapElement{
+  position:absolute;
+}
