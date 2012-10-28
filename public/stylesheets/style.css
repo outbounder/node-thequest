@@ -32,6 +32,7 @@ a {
 }
 
 .coin {
+  display:none;
   width: 32px;
   height: 32px;
   background: url('/coin.png') top left no-repeat;

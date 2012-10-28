@@ -56,10 +56,12 @@ _.extend(module.exports.prototype, {
   },
 
   addPlayer: function(player) {
+
     this.players.push(player);
     var state = player.state;
     state.x = rand(0, this.width);
     state.y = rand(0, this.height);
+    state.z = 1;
     if(this.players.length == 1)//this is the first player
       state.hasTreasure = true;
     this.broadcast("addPlayer", state);

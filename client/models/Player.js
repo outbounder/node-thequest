@@ -1,5 +1,7 @@
 module.exports = Backbone.Model.extend({
+
   idAttribute:"username",
+
   defaults:{
     hasTreasure: null,
     username: null,
@@ -7,6 +9,11 @@ module.exports = Backbone.Model.extend({
     width: null,
     x: null,
     y: null,
-    z: 1
+    z: null
+  },
+
+  remove:function(){
+    this.trigger("remove");
+    this.unbind();
   }
 });

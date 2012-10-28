@@ -1,20 +1,28 @@
 module.exports = Backbone.View.extend({
   className: "player",
+  coin: "<div class='coin'></div>",
   
   initialize:function(){
-    this.model.on("change", function(){
-      this.render();
-      this.trigger("change", this);
-    }, this);
+    this.model.on("change:x change:y change:z", this.move, this);
+    this.model.on("change:hasTreasure", this.treasure, this);
+    this.$el.append($(this.coin));
   },
 
   render: function(){
-    if(this.model.get("hasTreasure"))
-      this.$el.append($("<div class='coin'></div>"));
-    else
-      this.$(".coin").remove();
+    this.model.change();
     return this;
   },
+
+  move:function(){
+    this.trigger("change", this);
+  },
+
+  treasure: function(model){
+    model.get("hasTreasure")?
+      this.$(".coin").show():
+      this.$(".coin").hide();
+  },
+
 
   remove:function(){
     this.model.unbind();

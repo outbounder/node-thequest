@@ -4,6 +4,7 @@ module.exports = function(user){
     , hasTreasure: false
     , x: 0
     , y: 0
+    , z: 0
     , width: 32
     , height: 32
   };
@@ -13,17 +14,21 @@ module.exports = function(user){
     , top: false
     , right: false
     , bottom: false
+    , jump: false
   };
   
+
   var acceleration = {
     x: 0
     , y: 0
+    , z: 0
   }
   
   var DIMENSIONS = { x: 32, y: 32 };
   var ACCELERATION = 3;
   var DECCELERATION = 1;
   var MAX_SPEED = 20;
+
   var changeAcceleration = function (dir, coef, pressed) {
     var val = acceleration[dir] * coef;
     if (val > 0 && !pressed) { //moving in that direction and not pressing - stopping
@@ -32,6 +37,29 @@ module.exports = function(user){
     if (pressed && val < MAX_SPEED) { //apply acceleration
       acceleration[dir] = Math.min(MAX_SPEED, (val + ACCELERATION)) * coef;
     }
+  };
+
+  var JUMP_POWER = 5;
+  var GROUND = 1;
+  var G = 1;
+  var onAir = false;
+  
+  var jump = function(pressed, z){
+    if (pressed && !onAir){//Jumping
+      onAir = true;
+      acceleration.z = JUMP_POWER;
+      return z + acceleration.z;
+    }
+    if(onAir && z>GROUND){
+      acceleration.z -= G;
+      return z + acceleration.z;
+    }
+    if(onAir && z<=GROUND){
+      onAir = false;
+      acceleration.z = 0;
+      return GROUND;
+    }
+    return z;
   }
   
   
@@ -45,6 +73,8 @@ module.exports = function(user){
     //actually change position
     this.state.x += acceleration.x;
     this.state.y += acceleration.y;
+    console.log(this.state.z, this.direction.jump, acceleration.z) ;
+    this.state.z = jump(this.direction.jump, this.state.z);
   }
  
   this.getDistance = function (player) {

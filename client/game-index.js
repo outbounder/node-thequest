@@ -1,16 +1,11 @@
-_ = require("underscore");
 var socket = io.connect();
-
-var Player = require("./views/Player");
-var players = [];
-
 var PlayersCollection = require("./collections/PlayersCollection");
-var playersCollection = new PlayersCollection();
+var players = new PlayersCollection();
 
 var WorldView = require("./views/WorldView");
 var World = new WorldView({
   el:".gameWorld",
-  collection: playersCollection
+  collection: players
 }).render();
 
 socket.on('visitorsOnline', function (data) {
@@ -26,27 +21,23 @@ socket.on("connect", function(){
 });
 
 socket.on("addPlayer", function(playerData){
-  if(World.collection.get(playerData.username))
-    World.collection.add(playerData);
-  else
+    console.log("<addPlayer>",playerData);
     World.collection.add(playerData);
 });
 
 socket.on("players", function(gameState){
   var playersData = gameState.players;
-  for(var i = 0; i<playersData.length; i++) {
-    var playerData = playersData[i];
-    playersCollection.add(playerData);
-  }
+  var l = playersData.length;
+  for(var i = 0; i<l; i++)
+    players.add(playersData[i]);
 });
 
 socket.on("removePlayer", function(playerData){
-  playersCollection.get(playerData.username).remove();
+  players.get(playerData.username).remove();
 });
 
-
 var movePlayer = function(playerData){
-  playersCollection.get(playerData.username).set(playerData);
+  players.get(playerData.username).set(playerData);
 };
 
 socket.on("movePlayer", movePlayer);
@@ -58,13 +49,13 @@ socket.on("updateGame", function (gameState) {
 });
 
 socket.on("treasureTrapped", function(p1Data, p2Data){
-  playersCollection.get(p1Data).set(p1Data);
+  players.get(p1Data).set(p1Data);
   if(p2Data)
-    playersCollection.get(p2Data).set(p2Data);
+    players.get(p2Data).set(p2Data);
 })
 
 socket.on("restart", function(){
-  playersCollection.reset();
+  players.reset();
   socket.emit("addPlayer");
 });
 
@@ -79,14 +70,18 @@ var direction = function (e) {
     dir = "bottom";
   if(e.keyCode == 38)
     dir = "top";
+  if(e.keyCode == 32)
+    dir = "jump";
   
   return dir;
 }
 
 $(window).on("keydown", function(e){
-  socket.emit("directionChange", true, direction(e));
+  var dir = direction(e);
+  dir !== "" ? socket.emit("directionChange", true, direction(e)) : false;
 });
 
 $(window).on("keyup", function(e){
-  socket.emit("directionChange", false, direction(e));
+  var dir = direction(e);
+  dir !== "" ? socket.emit("directionChange", false, direction(e)) : false;
 });
