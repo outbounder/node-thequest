@@ -1,10 +1,10 @@
 var _ = require("underscore");
 
-module.exports = function(user, socket){
-  this.socket = socket;
+module.exports = function(client){
+  this.client = client;
 
   this.state = { 
-    username: user.username
+    username: client.username
     , hasTreasure: false
     , x: 0
     , y: 0

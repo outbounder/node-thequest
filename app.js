@@ -1,7 +1,7 @@
 
 /**
- * Module dependencies.
- */
+* Module dependencies.
+*/
 
 if(process.env.NODE_ENV == "azure")
   config = require("./config/azure");
@@ -25,9 +25,9 @@ var cookieParser = express.cookieParser("thequest");
 var sessionStore = new MongoStore(config.MongoStore);
 
 var db = mongoose.createConnection(config.mongoose.hostname,
-                    config.mongoose.db,
-                    config.mongoose.port,
-                    config.mongoose.opts);
+		    config.mongoose.db,
+		    config.mongoose.port,
+		    config.mongoose.opts);
 db.once("open", function(){
   require("./models/Backbone").db = db;
   
@@ -60,9 +60,10 @@ db.once("open", function(){
   actions.mount(app, require("./routes/user"));
   actions.mount(app, require("./routes/game"));
 
-  var GameWorld = require("./models/GameWorld");
-  var User = require("./models/User");
-  var Player = require("./models/Player");
+  var GameWorld = require("./models/GameWorld")
+  , User = require("./models/User")
+  , Player = require("./models/Player")
+  , Client = require("./models/Client");
 
   var server = http.createServer(app).listen(app.get('port'), "0.0.0.0",function(){
     console.log("Express server listening on port " + app.get('port'));
@@ -83,27 +84,31 @@ db.once("open", function(){
 
       if(!session.userId) return;
       User.findById(session.userId, function(err, user){
-        if(err) return console.log(err);
-        if(!user) return console.log("user not registered");
-        socket.player = new Player(user, socket);
+	if(err) return console.log(err);
+	if(!user) return console.log("user not registered");
+	
+	var client = Client.create(socket, user);
+	var player = new Player(client);
+	
+	client.onAddPlayer = function(){
+	  game.addPlayer(player);
+	};
+	
+	client.onDirectionChange = function(isSet, dir){
+	  player.direction[dir] = isSet;
+	};
+	
+	client.onRemovePlayer = function () {
+	  game.removePlayer(player);
+	}
+	
+	client.onDisconnect = function () {
+	  player = null;
+	  io.clientsCount -= 1;
+	  io.sockets.emit("visitorsOnline", io.clientsCount);
+	};
 
-        socket.on("addPlayer", function(){
-          game.addPlayer(socket.player);
-        });
-
-        socket.on("directionChange", function(isSet, dir){
-          socket.player.direction[dir] = isSet;
-        });
-        
-        socket.on("disconnect", function(){
-          if(socket.player)
-            game.removePlayer(socket.player);
-          socket.player = null;
-          io.clientsCount -= 1;
-          io.sockets.emit("visitorsOnline", io.clientsCount);
-        });
-
-        socket.emit("registered");
+	client.registered();
       });
     });
 

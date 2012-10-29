@@ -49,9 +49,14 @@ _.extend(module.exports.prototype, {
   gameTickInterval: 1000, // milis
   
   broadcast: function (message, data) {
-    for (var i = this.players.length - 1; i >= 0; i--) {
-      this.players[i].socket.emit(message, data);
-    };
+    data = (typeof data !== "undefined")? data: {};
+    console.log(message, ":", data);
+    this.players.forEach(function (pl) {
+      pl.client[message](data);
+    });
+    //for (var i = this.players.length - 1; i >= 0; i--) {
+    //  this.players[i].socket.emit(message, data);
+    //};
   },
 
   addPlayer: function(player) {
