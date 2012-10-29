@@ -60,7 +60,7 @@ db.once("open", function(){
   actions.mount(app, require("./routes/user"));
   actions.mount(app, require("./routes/game"));
 
-  var GameWorld = require("./models/GameWorld")
+  var Game = require("./models/Game")
   , User = require("./models/User")
   , Player = require("./models/Player")
   , Client = require("./models/Client");
@@ -72,43 +72,18 @@ db.once("open", function(){
     io.set("log level", 0);
     var sio = new SessionSockets(io, sessionStore, cookieParser);
 
-    var game = new GameWorld(io);
-    game.restart();
-    console.log("game started");
+    var game = Game.create();
+    game.startWorld();
 
-    io.clientsCount = 0;
     sio.on("connection", function(err, socket, session){
       if(err) return console.log(err);
-      io.clientsCount += 1;
-      io.sockets.emit("visitorsOnline", io.clientsCount);
-
       if(!session.userId) return;
+	   
       User.findById(session.userId, function(err, user){
 	if(err) return console.log(err);
 	if(!user) return console.log("user not registered");
 	
-	var client = Client.create(socket, user);
-	var player = new Player(client);
-	
-	client.onAddPlayer = function(){
-	  game.addPlayer(player);
-	};
-	
-	client.onDirectionChange = function(isSet, dir){
-	  player.direction[dir] = isSet;
-	};
-	
-	client.onRemovePlayer = function () {
-	  game.removePlayer(player);
-	}
-	
-	client.onDisconnect = function () {
-	  player = null;
-	  io.clientsCount -= 1;
-	  io.sockets.emit("visitorsOnline", io.clientsCount);
-	};
-
-	client.registered();
+	game.addClient(Client.create(socket, user));
       });
     });
 

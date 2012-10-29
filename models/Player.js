@@ -1,7 +1,27 @@
 var _ = require("underscore");
 
-module.exports = function(client){
+var rand = function(LowerRange, UpperRange){
+  return Math.floor(Math.random() * (UpperRange - LowerRange + 1)) + LowerRange;
+}
+
+module.exports = function(client, world){
+  var that = this;
   this.client = client;
+  
+  this.direction = {
+    left: false
+    , top: false
+    , right: false
+    , bottom: false
+  };
+  
+  client.onDirectionChange = function(isSet, dir){
+    that.direction[dir] = isSet;
+  };
+  
+  client.onRemovePlayer = function () {
+    world.removePlayer(that);
+  }
 
   this.state = { 
     username: client.username
@@ -11,13 +31,6 @@ module.exports = function(client){
     , width: 32
     , height: 32
     , playerId: _.uniqueId()
-  };
-  
-  this.direction = {
-    left: false
-    , top: false
-    , right: false
-    , bottom: false
   };
   
   var acceleration = {
@@ -39,6 +52,12 @@ module.exports = function(client){
     }
   }
   
+  this.init = function (_hasTreasure) {
+    var state = this.state;
+    state.x = rand(0, world.width);
+    state.y = rand(0, world.height);
+    state.hasTreasure = _hasTreasure;
+  }
   
   this.update = function () {
     //calc change
