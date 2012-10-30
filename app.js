@@ -25,9 +25,9 @@ var cookieParser = express.cookieParser("thequest");
 var sessionStore = new MongoStore(config.MongoStore);
 
 var db = mongoose.createConnection(config.mongoose.hostname,
-		    config.mongoose.db,
-		    config.mongoose.port,
-		    config.mongoose.opts);
+                                  config.mongoose.db,
+                                  config.mongoose.port,
+                                  config.mongoose.opts);
 db.once("open", function(){
   require("./models/Backbone").db = db;
   
@@ -78,12 +78,12 @@ db.once("open", function(){
     sio.on("connection", function(err, socket, session){
       if(err) return console.log(err);
       if(!session.userId) return;
-	   
+      
       User.findById(session.userId, function(err, user){
-	if(err) return console.log(err);
-	if(!user) return console.log("user not registered");
-	
-	game.addClient(Client.create(socket, user));
+        if(err) return console.log(err);
+        if(!user) return console.log("user not registered");
+        
+        game.addClient(Client.create(socket, user));
       });
     });
 
