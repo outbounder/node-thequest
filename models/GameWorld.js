@@ -51,7 +51,7 @@ _.extend(module.exports.prototype, {
   broadcast: function (message, data) {
     data = (typeof data !== "undefined")? data: {};
     this.players.forEach(function (pl) {
-      pl.client[message](data);
+      pl[message](data);
     });
     //for (var i = this.players.length - 1; i >= 0; i--) {
     //  this.players[i].socket.emit(message, data);
@@ -66,14 +66,15 @@ _.extend(module.exports.prototype, {
   removePlayer: function(player) {
     this.players.splice(this.players.indexOf(player), 1);
     
-    var state = player.state;
-    this.broadcast("removePlayer", state);
-    if(state.hasTreasure && this.players.length > 0) {
-      state.hasTreasure = false;
-      p = this.players[rand(0,this.players.length-1)];
-      p.state.hasTreasure = true;
-      this.broadcast("treasureTrapped", p.state);
+    this.broadcast("removePlayer", player.state);
+    if(player.hasTreasure && this.players.length > 0) {
+      this.giveNewTreasure();
     }
+  },
+  giveNewTreasure: function () {
+    var p = this.players[rand(0,this.players.length-1)];
+    p.hasTreasure = true;
+    this.broadcast("treasureTrapped", p.state);
   },
   restart: function () {
     this.broadcast("restart");
