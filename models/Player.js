@@ -15,11 +15,10 @@ var create = function (client, world) {
   , position = Vector.create()
   , hasTreasure = false
   , speed = Vector.create() //Zeroed vector
-  
-  , DIMENSIONS = Vector.create({x: 32, y: 32})
-  , ACCELERATION = 3
-  , FRICTION = 0.1
-  , MAX_SPEED = 20;
+  , mass = 10
+  , directionForce = 30
+  , frictionCoef = 1 //kg/s
+  , DIMENSIONS = Vector.create({x: 32, y: 32});
   
   Object.defineProperty(that, "position", {
     get: function () {
@@ -98,7 +97,7 @@ var create = function (client, world) {
   }
   
   that.calcFriction = function (_speed, _forceDirection) {
-    return _speed.multiply(FRICTION);
+    return _speed.multiply(frictionCoef).multiply(1/mass);
   }
   
   that.calcAcceleration = function (_speed, _forceDirection) {
@@ -108,7 +107,7 @@ var create = function (client, world) {
         val[dir.dimension] = (val[dir.dimension] || 0) + dir.towards;
       }
     });
-    return Vector.create(val).multiply(ACCELERATION);
+    return Vector.create(val).multiply(directionForce / mass);
   }
   
   that.calcDistance = function (positionedObject) {
