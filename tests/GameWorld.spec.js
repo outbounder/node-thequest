@@ -4,7 +4,11 @@ var mockupIO = {
   }
 }
 
-describe("Game World", function(){
+
+/* This test is totally out of date, we should implement new tests for the new structure and responsibilities
+ *      --valeribogdanov 
+ */
+xdescribe("Game World", function(){
   var GameWorld = require("../models/GameWorld");
   var Player = require("../models/Player");
   var User = require("../models/User");

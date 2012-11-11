@@ -1,43 +1,43 @@
 var _ = require("underscore");
 
+
 var rand = function(LowerRange, UpperRange){
   return Math.floor(Math.random() * (UpperRange - LowerRange + 1)) + LowerRange;
 }
 
-var applyGameRules = function (players) {
-  //TODO: use forEach... in next revision :)
-  var i, j;
-  for (i = 0; i < players.length; i ++) {
-    players[i].update();
-  }
-  for (i = 0; i < players.length; i ++) {
-    var pl = players[i];
-    pl.handleGameAreaCollisions({left: 0, top: 0, right: 800, bottom: 600})
-    for(j = 0; j < players.length; j ++) {
-      pl.handlePlayerCollisions(players[j]);
-    }
-  }
+var timestamp = function () {
+  return new Date().getTime();
 }
 
-module.exports = function(io){
+module.exports = function(duration){
   this.players = [];
-  this.io = io;
-  
+  this.endTime = duration + timestamp();
   var that = this;
   
-  var gameCycle = function(){
-    applyGameRules(that.players);
+  
+  that.applyGameRules = function () {
+    var players = that.players;
+    players.forEach(function (player) {
+      player.update();
+    });
+    
+    players.forEach(function (player) {
+      player.handleGameAreaCollisions({left: 0, top: 0, right: that.width, bottom: that.height});
+      players.forEach(function (anotherPlayer) {
+	if (player !== anotherPlayer) {
+	  player.handlePlayerCollisions(anotherPlayer);
+	}
+      });
+    });
+    
+  }
+  
+  that.updateGame = function () {
+    that.applyGameRules();
+    this.timeLeft = Math.floor((this.endTime - timestamp()) / 1000);
     that.broadcast("updateGame", that.getGameState());
-    /* 
-     * Use Timeout instead of Interval to ensure that the computer has its time to finish calculations. 
-     * Using setInterval can lead to multiple gameCycle invokation waiting in the queue for execution 
-     * and lead to possible errors when working with non-block operations
-     */
-    setTimeout(gameCycle, 20); 
   };
   
-  //init:
-  gameCycle();
 }
 
 _.extend(module.exports.prototype, {
@@ -49,45 +49,35 @@ _.extend(module.exports.prototype, {
   gameTickInterval: 1000, // milis
   
   broadcast: function (message, data) {
-    for (var i = this.players.length - 1; i >= 0; i--) {
-      this.players[i].socket.emit(message, data);
-    };
+    data = (typeof data !== "undefined")? data: {};
+    this.players.forEach(function (pl) {
+      pl[message](data);
+    });
+    //for (var i = this.players.length - 1; i >= 0; i--) {
+    //  this.players[i].socket.emit(message, data);
+    //};
   },
 
   addPlayer: function(player) {
-    var state = player.state;
-    state.x = rand(0, this.width);
-    state.y = rand(0, this.height);
-    state.hasTreasure = this.players.length == 0;
-    this.broadcast("addPlayer", state);
+    player.init(this.players.length == 0);
+    this.broadcast("addPlayer", player.state);
     this.players.push(player);
   },
   removePlayer: function(player) {
     this.players.splice(this.players.indexOf(player), 1);
     
-    var state = player.state;
-    this.broadcast("removePlayer", state);
-    if(state.hasTreasure && this.players.length > 0) {
-      state.hasTreasure = false;
-      p = this.players[rand(0,this.players.length-1)];
-      p.state.hasTreasure = true;
-      this.broadcast("treasureTrapped", p.state);
+    this.broadcast("removePlayer", player.state);
+    if(player.hasTreasure && this.players.length > 0) {
+      this.giveNewTreasure();
     }
   },
-  restart: function(){
-    if(this.gameIntervalId)
-      clearInterval(this.gameIntervalId);
-
-    var self = this;
-    this.gameIntervalId = setInterval(function(){
-      self.timeLeft -= 1;
-      if(self.timeLeft < 0)
-        self.restart();
-    }, this.gameTickInterval);
-
-    this.timeLeft = this.gameDuration;
-    this.players = [];
-    this.io.sockets.emit("restart");
+  giveNewTreasure: function () {
+    var p = this.players[rand(0,this.players.length-1)];
+    p.hasTreasure = true;
+    this.broadcast("treasureTrapped", p.state);
+  },
+  restart: function () {
+    this.broadcast("restart");
   },
   getGameState: function () {
     var gameState = {

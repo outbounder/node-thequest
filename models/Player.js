@@ -1,224 +1,257 @@
-var _ = require("underscore");
+var _ = require("underscore")
+, Vector = require("./Vector")
+, Dimensions = require("./Dimensions")
+, Directions = require("./Directions");
 
-module.exports = function(user, socket){
-  this.socket = socket;
+//FIXME: this function is duplicated in Player and World.. do something about it
+var rand = function(LowerRange, UpperRange){
+  return Math.floor(Math.random() * (UpperRange - LowerRange + 1)) + LowerRange;
+}
 
-  this.state = { 
-    username: user.username
-    , hasTreasure: false
-    , x: 0
-    , y: 0
-    , width: 32
-    , height: 32
-    , playerId: _.uniqueId()
+var create = function (client, world) {
+  var that = Object.create(client)
+  , id = _.uniqueId()
+  , forceDirection = Directions.enumMap()
+  , position = Vector.create()
+  , hasTreasure = false
+  , speed = Vector.create() //Zeroed vector
+  
+  , DIMENSIONS = Vector.create({x: 32, y: 32})
+  , ACCELERATION = 3
+  , FRICTION = 0.1
+  , MAX_SPEED = 20;
+  
+  Object.defineProperty(that, "position", {
+    get: function () {
+      return position;
+    }
+  });
+
+  Object.defineProperty(that, "hasTreasure", {
+    get: function () {
+      return hasTreasure;
+    }
+    , set: function (_treasure) {
+      hasTreasure = _treasure;
+    }
+  });
+  
+  Object.defineProperty(that, "speed", {
+    get: function () {
+      return speed;
+    }
+    , set: function (val) {
+      speed = val;
+    }
+  });
+  
+  Object.defineProperty(that, "state", {
+    get: function () {
+      return {
+        username: that.username
+        , hasTreasure: that.hasTreasure
+        , x: Math.round(that.position.x)
+        , y: Math.round(that.position.y)
+        , width: DIMENSIONS.x
+        , height: DIMENSIONS.y
+        , playerId: id
+      }
+    }
+  });
+  
+  client.onDirectionChange = function(isSet, dir){
+    forceDirection[dir] = isSet;
   };
   
-  this.direction = {
-    left: false
-    , top: false
-    , right: false
-    , bottom: false
-  };
-  
-  var acceleration = {
-    x: 0
-    , y: 0
+  client.onRemovePlayer = function () {
+    world.removePlayer(that);
   }
   
-  var DIMENSIONS = { x: 32, y: 32 };
-  var ACCELERATION = 3;
-  var DECCELERATION = 1;
-  var MAX_SPEED = 20;
-  var changeAcceleration = function (dir, coef, pressed) {
-    var val = acceleration[dir] * coef;
-    if (val > 0 && !pressed) { //moving in that direction and not pressing - stopping
-      acceleration[dir] = Math.max(val - DECCELERATION, 0) * coef;
-    }
-    if (pressed && val < MAX_SPEED) { //apply acceleration
-      acceleration[dir] = Math.min(MAX_SPEED, (val + ACCELERATION)) * coef;
-    }
+  that.init = function (_hasTreasure) {
+    position = Vector.create({
+      x: rand(0, world.width)
+      , y: rand(0, world.height)
+    });
+    hasTreasure = _hasTreasure;
+  }
+  
+  that.update = function () {
+    position = that.calcPosition(speed, forceDirection);
   }
   
   
-  this.update = function () {
-    //calc change
-    changeAcceleration("x", -1, this.direction.left);
-    changeAcceleration("y", -1, this.direction.top);
-    changeAcceleration("x", +1, this.direction.right);
-    changeAcceleration("y", +1, this.direction.bottom);
-
-    //actually change position
-    this.state.x += acceleration.x;
-    this.state.y += acceleration.y;
+  that.updateSpeed = function (_speed, _forceDirection) {
+    speed = that.calcSpeed(_speed, _forceDirection);
   }
- 
-  this.getDistance = function (player) {
-    var state = this.state;
-    var st = player.state;
-    return {
-      x: Math.abs(st.x - state.x) - state.width
-      , y: Math.abs(st.y - state.y) - state.height
-    }
+  
+  /*
+   * all public calc~ methods are intended as an extension point to add diff:erent behavior
+   */
+  that.calcPosition = function (_speed, _forceDirection) {
+    that.updateSpeed(_speed, _forceDirection);
+    return position.add(that.speed/* speed in points/iteration * 1 iteration */);
+  }
+  
+  that.calcSpeed = function (_speed, _forceDirection) {
+    _speed = _speed.substract(that.calcFriction(_speed, _forceDirection));
+    return _speed.add(that.calcAcceleration(_speed, _forceDirection));
+  }
+  
+  that.calcFriction = function (_speed, _forceDirection) {
+    return _speed.multiply(FRICTION);
+  }
+  
+  that.calcAcceleration = function (_speed, _forceDirection) {
+    var val = {}
+    Directions.each(function (dir) {
+      if (_forceDirection[dir]) {
+        val[dir.dimension] = (val[dir.dimension] || 0) + dir.towards;
+      }
+    });
+    return Vector.create(val).multiply(ACCELERATION);
+  }
+  
+  that.calcDistance = function (positionedObject) {
+    return that.position
+    .substract(positionedObject.position)
+    .abs()
+    .substract(DIMENSIONS); //asume all positionedObject have constant sizes = DIMENSIONS
   }
   
   var isCollision = function (dist) {
-    return dist.x <= 0 && dist.y <= 0;
+    //negative in all dimensions:
+    return dist.revert().equals(dist.abs());
   }
   
-  this.isColliding = function (player) {
-    return isCollision(this.getDistance(player));
+  that.isColliding = function (player) {
+    return isCollision(that.calcDistance(player));
   }
   
-  this.handleGameAreaCollisions = function (area) {
-      var state = this.state;
-      if (state.x < area.left) {
-	state.x = area.left;
-	acceleration.x = Math.abs(acceleration.x); //move to the right
-      }
-      if (state.y < area.top) {
-	state.y = area.top;
-	acceleration.y = Math.abs(acceleration.y);
-      }
-      if (state.x + state.width > area.right) {
-	state.x = area.right - state.width;
-	acceleration.x = - Math.abs(acceleration.x);
-      }
-      if (state.y + state.height > area.bottom) {
-	state.y = area.bottom - state.height;
-	acceleration.y = - Math.abs(acceleration.y);
-      }
-  }
   
-  this.changeDirection = function (attr, coef, shift) {
-    this.state[attr] = this.state[attr] + shift * coef;
-    acceleration[attr] = Math.abs(acceleration[attr]) * coef;
+  that.handleGameAreaCollisions = function (area) {
+    var move = {};
+    Directions.each(function (dir) {
+      /*
+       * 0 for left, top, 1 for right, bottom 
+       * TODO: this must change, and array for all directions must represent the distance in that direction from position. 
+       * This way we will escape the dependecy on position being the top left corner
+       */
+      var withDimensions = (1 + dir.towards) / 2;
+      
+      var dim = dir.dimension;
+      
+      var playerEnd = that.position[dim] + withDimensions * DIMENSIONS[dim];
+      var distanceToWall = (area[dir] - playerEnd) * dir.towards;
+      
+      if (distanceToWall < 0) { //collision with game wall
+        move[dim] = distanceToWall * dir.towards;
+        speed = speed.revertDim(dim);
+      }
+    });
+    position = position.add(Vector.create(move));//  .multiply(2) for elastic hit and time calculation, but starts looking less realistic
   }
+   
+  var calcTimeOfImpact = function (player1, player2) {
+    var dotImpactSpeed = player1.speed.substract(player2.speed);
+    var dotImpactDistance = player1.position.substract(player2.position);
+    var absDotImpactSpeed = dotImpactSpeed.abs();
     
-  var distanceOfImpact = function (dir, player1, player2) {
-    //calculate direction of impact
-    // - 1 player 1 was hit from lower, 0 - equal speeds, no direction on dir, +1 - player1 was hit from higher
-    var directionOfImpact = compare(player1.acc()[dir], player2.acc()[dir]); 
-    /*
-     * Let player 2 be hitting from right, player1 from left
-     * player1.acc > player2.acc, therefore directionOfImpact = +1
-     * (player2 absolute x position - player1 absolute x position) * +1 - how close positions of players are, if value is negative they swap places
-     * - width -> results in negative value equal to the number of points they traveled after collision.
-     */
-    var distanceToImpact = ((player2.state[dir] - player1.state[dir]) * directionOfImpact - DIMENSIONS[dir]);
-    return -distanceToImpact;
+    var timesAfterImpact = Dimensions.map(function (dim) {
+      /* 
+       * calculate dot's impact time (might be negative) and add the time for passing the dimensions. 
+       * The lowest number (must be non-negative) is the actual time after impact. It must be between 0 and 1
+       */
+      return (dotImpactDistance[dim] / dotImpactSpeed[dim]) + (DIMENSIONS[dim] / absDotImpactSpeed[dim]);
+    });
+    
+    var time = Math.min.apply(Math, timesAfterImpact);
+    
+    if (time < 0 || time > 1) {
+      console.log("error in calcualtion: collision time calcualte to ", time, " cycles. speeds and positions:"
+      , " player1: {", player1.speed, player1.position, "}"
+      , " player2: {", player2.speed, player2.position, "}");
+      return 1;
+    }
+    return time;
   };
   
-  var compare = function (a, b) {
-    if (a === b) return 0; // prevent 0/0 as it is not 0, but NaN
-    return (a - b) / Math.abs(a - b);
-  }
-  
-  var speedOfImpact = function (dir, acc1, acc2) {
-    var a = acc1[dir]
-    , b = acc2[dir];
-    /*
-     let a > b in the following examples:
-     if b >= 0, a > 0 -> a chases b, speed is a - b
-     if a >= 0, b < 0 -> a speeds against b, speed is a + (-b) -> a - b
-     if a < 0, b < 0 -> b chases a towards -Infinity, speed is (-b) - (-a) -> a - b
-       
-     Therefore speed of impact on a given direction is the higherValue - lowerValue:
-    */
-    return Math.max(a, b) - Math.min(a, b);
-  };
-  
-  var calcTimeOfImpact = function (dir, player1, player2) {
-    var speed = speedOfImpact(dir, player1.acc(), player2.acc());
-    if (speed == 0) return 1; //instead of Infinity
-    return distanceOfImpact(dir, player1, player2) / speed;
-  };
-  
-  this.handlePlayerCollisions = function (player) {
-    if (player == this)
+  that.handlePlayerCollisions = function (player) {
+    if (player === that)
       return;
-    var dist = this.getDistance(player);
-    if (this.isColliding(player)) {
+
+    if (that.isColliding(player)) {
       //resolve collision
-     
-      //calculate time of impact
-      var timeOfImpact = Math.min(
-	  calcTimeOfImpact("x", this, player)
-	  , calcTimeOfImpact("y", this, player)
-      );
+      var timeOfImpact = calcTimeOfImpact(that, player);
       
       //revert time to time of impact
-      this.moveTime(-timeOfImpact);
+      that.moveTime(-timeOfImpact);
       player.moveTime(-timeOfImpact);
     
-      //swap accelerations
-      var tmp = this.acc();
-      this.acc(player.acc());
-      player.acc(tmp);
+      //swap speeds
+      var tmp = that.speed;
+      that.speed = player.speed;
+      player.speed = tmp;
       
-      //move with time of impact
-      this.moveTime(timeOfImpact);
+      //move with time of impact - elastic hit occured before "timeOfImpact", we must proceed moving forward
+      that.moveTime(timeOfImpact);
       player.moveTime(timeOfImpact);
       
-      this.ensureCollisionIsResolved(player);
+      that.ensureCollisionIsResolved(player);
       
       //swap treasure owner
-      tmp = this.state.hasTreasure;
-      this.state.hasTreasure = player.state.hasTreasure;
-      player.state.hasTreasure = tmp;
+      tmp = that.hasTreasure;
+      that.hasTreasure = player.hasTreasure;
+      player.hasTreasure = tmp;
       
     }
   }
   
-  this.ensureCollisionIsResolved = function (player) {
+  that.ensureCollisionIsResolved = function (player) {
     //just run away
-    if(this.isColliding(player)) { 
+    if(that.isColliding(player)) { 
       player.moveTime(1);
-      this.moveTime(1);
+      that.moveTime(1);
     }
     
-    //and if it is still colliding just go until we find a way out
-    while(this.isColliding(player)) {
-      console.log("things got f*cked up");
+    //and if it is still colliding just go random directions until we find a way out
+    while(that.isColliding(player)) {
+      console.log("things got f*cked up: " + that.position + that.speed + player.position + player.speed);
       //in case we have a unit blocked at a wall and another colliding non-stop with it they get stuck. 
-      //This should resolve the issue. But keep in mind this is buggy behavior
-      if (this.isStill() || player.isStill()) {
-	var newAcc = { 
-	  x: Math.round(Math.random()*30)
-	  , y: Math.round(Math.random()*30)
-	}
-	//go in opposite directions
-	this.acc(newAcc)
-	player.acc({x: -newAcc.x, y: -newAcc.y});
+      //This should resolve the issue. But keep in mind that is buggy behavior
+      if (that.isStill() || player.isStill()) {
+        var newAcc = Vector.create({ 
+          x: rand(-20, 20)
+          , y: rand(-20, 20)
+        })
+        //go in opposite directions
+        that.speed = newAcc
+        player.speed = newAcc.revert();
       }
       
-      for (var retry = 0; retry < 10 && this.isColliding(player); retry ++) {
-	player.moveTime(1);
-	this.moveTime(1);
+      //move them until they are away from each other...
+      for (var retry = 0; retry < 10 && that.isColliding(player); retry ++) {
+        player.moveTime(1);
+        that.moveTime(1);
       }
     }
   }
   
-  var roundFurther = function (value) {
-    return (value >= 0) ? Math.ceil(value): Math.floor(value);
+  that.moveTime = function(time) {
+    position = position.add(speed.multiply(time));
   }
   
-  this.moveTime = function(time, fn) {
-    this.state.x += roundFurther(acceleration.x * time);
-    this.state.y += roundFurther(acceleration.y * time);
+  that.isStill = function () {
+    return speed.equals(Vector.create());
   }
-  
-  this.isStill = function () {
-    return acceleration.x === 0 && acceleration.y === 0;
-  }
-  
-  this.acc = function (arg) {
-    if (typeof arg !== "undefined") {
-      acceleration = arg;
-    } else {
-      return acceleration;
-    }
-  };
+ 
+ return that;
 }
+
+module.exports = function(client, world){
+  return create(client, world); //handle new Player(args) and Player(args) invokations
+}
+
+module.exports.create = create;
 
 
 
