@@ -38,3 +38,27 @@ a {
   position: absolute;
   left: 25px;
 }
+
+.endLabel {
+  width: 800px;
+  height: 600px;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 48px;
+  line-height: 600px;
+  color: white;
+  background-color: gray;
+  opacity: 0.5;
+  position: absolute;
+  z-index: 100;
+}
+
+.menu {
+  margin: 0 auto;
+  width: 800px;
+}
+
+.menuItem {
+  float:left;
+  width: 250px;
+}

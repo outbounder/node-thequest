@@ -10,6 +10,12 @@ var getPlayerById = function(playerId){
       return players[i];
 }
 
+var getPlayerByUsername = function(username){
+  for(var i = 0; i<players.length; i++)
+    if(players[i].username == username)
+      return players[i]; 
+}
+
 var addOrUpdate = function(playerData){
   var player = getPlayerById(playerData.playerId);
   if(!player) {
@@ -21,10 +27,6 @@ var addOrUpdate = function(playerData){
     player.render();
   }
 }
-
-socket.on('visitorsOnline', function (data) {
-  $(".visitorsCount").html(data);
-});
 
 socket.on("registered", function(){
   socket.emit("addPlayer");  
@@ -55,12 +57,18 @@ socket.on("treasureTrapped", function(p1Data, p2Data){
 })
 
 socket.on("endgame", function (victory) {
-  //TODO: make this better, don't use alert
-  window.alert(victory?"You WIN!!!":"You lost :(");
+  $(".endLabel").hide();
+  victory?$(".winLabel").show():$(".looseLabel").show();
+
+  var player = getPlayerByUsername(user.username);
+  player.victories += victory?1:0;
+  $(".victoriesCount").html(player.victories);
 })
 
 socket.on("restart", function(){
+  $(".endLabel").hide();
   $(".player").remove();
+
   players = [];
   socket.emit("addPlayer");
 });
@@ -87,3 +95,5 @@ $(window).on("keydown", function(e){
 $(window).on("keyup", function(e){
   socket.emit("directionChange", false, direction(e));
 });
+
+$(".endLabel").hide();
