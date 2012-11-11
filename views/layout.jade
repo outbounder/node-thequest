@@ -7,4 +7,20 @@ html
     script(src='http://code.jquery.com/jquery.min.js')
     script(src='/socket.io/socket.io.js')
   body
+    .navbar.navbar-inverse.navbar-fixed-top
+      .navbar-inner
+        .container
+          a.btn.btn-navbar(data-toggle='collapse', data-target='.nav-collapse')
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a.brand(href='/') The quest game
+          .nav-collapse.collapse
+            ul.nav
+              li
+                a(href='/game') Game
+              li
+                a(href='/users/login') Login
+              li
+                a(href='/users/register') Register
     block content
