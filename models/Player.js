@@ -92,22 +92,27 @@ var create = function (client, world) {
   }
   
   that.calcSpeed = function (_speed, _forceDirection) {
-    _speed = _speed.substract(that.calcFriction(_speed, _forceDirection));
     return _speed.add(that.calcAcceleration(_speed, _forceDirection));
   }
   
-  that.calcFriction = function (_speed, _forceDirection) {
-    return _speed.multiply(frictionCoef).multiply(1/mass);
+  that.calcAcceleration = function (_speed, _forceDirection) {
+    var sforce = that.calcFrictionForce(_speed, _forceDirection);
+    sforce = sforce.add(that.calcPushForce(_speed, _forceDirection));
+    return sforce.multiply(1/mass);
   }
   
-  that.calcAcceleration = function (_speed, _forceDirection) {
+  that.calcFrictionForce = function (_speed, _forceDirection) {
+    return _speed.multiply(frictionCoef).revert();
+  }
+  
+  that.calcPushForce = function (_speed, _forceDirection) {
     var val = {}
     Directions.each(function (dir) {
       if (_forceDirection[dir]) {
         val[dir.dimension] = (val[dir.dimension] || 0) + dir.towards;
       }
     });
-    return Vector.create(val).multiply(directionForce / mass);
+    return Vector.create(val).multiply(directionForce);
   }
   
   that.calcDistance = function (positionedObject) {
