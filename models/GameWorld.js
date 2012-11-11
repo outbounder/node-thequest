@@ -90,5 +90,10 @@ _.extend(module.exports.prototype, {
     }
     
     return gameState;
+  },
+  declareWinner: function () {
+    this.players.forEach(function (pl) {
+      pl.endgame(pl.hasTreasure);
+    });
   }
 });

@@ -10,6 +10,13 @@ var create = function (socket, user) {
   var client = {};
   
   client.username = user.username;
+  client.victories = 0;
+  
+  client.endgame = function (victory) {
+    client.victories += victory;
+    //maybe act more on this
+    socket.emit("endgame", victory);
+  };
   
   //Server to client
   client.restart = function () {

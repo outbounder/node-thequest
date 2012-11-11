@@ -51,6 +51,7 @@ var create = function () {
     setTimeout(function () {
       var _world = world;
       game.startWorld();
+      _world.declareWinner();
       _world.restart();
     }, GAME_DURATION);
   };

@@ -5,7 +5,7 @@ module.exports = function(data){
 
 _.extend(module.exports.prototype, {
   render: function(){
-    this.$el.find(".name").html(this.username);
+    this.$el.find(".name").html(this.username +"&nbsp;"+ this.victories);
     this.$el.addClass("player");
     
     if(this.hasTreasure)
