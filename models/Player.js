@@ -54,6 +54,7 @@ var create = function (client, world) {
         , width: DIMENSIONS.x
         , height: DIMENSIONS.y
         , playerId: id
+        , victories: client.victories
       }
     }
   });
@@ -96,9 +97,9 @@ var create = function (client, world) {
   }
   
   that.calcAcceleration = function (_speed, _forceDirection) {
-    var sforce = that.calcFrictionForce(_speed, _forceDirection);
-    sforce = sforce.add(that.calcPushForce(_speed, _forceDirection));
-    return sforce.multiply(1/mass);
+    var netforce = that.calcFrictionForce(_speed, _forceDirection);
+    netforce = netforce.add(that.calcPushForce(_speed, _forceDirection));
+    return netforce.multiply(1/mass);
   }
   
   that.calcFrictionForce = function (_speed, _forceDirection) {

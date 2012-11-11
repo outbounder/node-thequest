@@ -54,6 +54,11 @@ socket.on("treasureTrapped", function(p1Data, p2Data){
     _.extend(getPlayerById(p2Data.playerId), p2Data).render();
 })
 
+socket.on("endgame", function (victory) {
+  //TODO: make this better, don't use alert
+  window.alert(victory?"You WIN!!!":"You lost :(");
+})
+
 socket.on("restart", function(){
   $(".player").remove();
   players = [];
