@@ -1,11 +1,67 @@
 extends layout
 
 block content
-  h1= title
-  span.visitorsTitle Visitors:
-  span.visitorsCount= 0
-  script.
-    var socket = io.connect();
-    socket.on('visitorsOnline', function (data) {
-      $(".visitorsCount").html(data);
-    });
+  .navbar.navbar-inverse.navbar-fixed-top
+    .navbar-inner
+      .container
+        a.btn.btn-navbar(data-toggle='collapse', data-target='.nav-collapse')
+          span.icon-bar
+          span.icon-bar
+          span.icon-bar
+        a.brand(href='#') The quest game
+        .nav-collapse.collapse
+          ul.nav
+            li.active
+              a(href='/game') Game
+            li
+              a(href='users/login') Login
+            li
+              a(href='users/register') Register
+        //
+          /.nav-collapse 
+  .container
+    //
+       Main message
+    .hero-unit
+      h1= title
+      p
+        | Meet the new very addictive, _open source_ 
+        | , realtime MMO game. The goal is simple - steal the treasure. Have fun NOW with your friends or other players all over the world.
+      p
+        a.btn.btn-primary.btn-large(href='/game') Play now » 
+        span.visitorsTitle  Visitors:
+        span.visitorsCount= 0
+
+        script.
+          var socket = io.connect();
+          socket.on('visitorsOnline', function (data) {
+            $(".visitorsCount").html(data);
+          });
+    // columns 
+
+    .row
+      .span4
+        h2 How the game was born
+        p
+          | Once upon a time there were a group of hackers who wanted to teach how to code on node.js. The same time Varna Lab announced the upcomming event - free node.js course. The magic was born.
+        p
+          a.btn(href='http://www.varnalab.org/') Varna Lab Hackerspace »
+      .span4
+        h2 Who created the game
+        p
+          | The inisial game was developed with much love for 4-5 hours from the course head man 
+          a(href='https://github.com/outbounder') outbounder. 
+          | Then almost all of course participants started with pull requests from 
+          a(href='https://github.com/outbounder/node-thequest/graphs/contributors') contributors.
+          | To see list of all contributors and game code click this button
+        p
+          a.btn(href='https://github.com/outbounder/node-thequest/graphs/contributors') Contributors »
+      .span4
+        h2 I wanna contribute
+        p
+          | If you want to add your super feature to the game, do not hesitate to make a pull request. All kind of help (code, design, servers, mentioning, feedback) is highly appreciated.
+        p
+          a.btn(href='https://trello.com/board/the-quest/508c26ce9334dadb7000298d') Leave us feedback »
+    hr
+    footer
+      p © VarnaLab.org 2012
