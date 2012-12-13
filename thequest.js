@@ -48,7 +48,8 @@ db.once("open", function(){
     app.use(express.static(path.join(__dirname, 'public')));
     app.use(browserify("./client/game-index.js", {
       mount: "/game-index.js",
-      cache: false
+      cache: false,
+      debug: true
     }));
   });
 

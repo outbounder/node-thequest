@@ -55,6 +55,7 @@ var create = function (client, world) {
         , height: DIMENSIONS.y
         , playerId: id
         , victories: client.victories
+        , directions: forceDirection
       }
     }
   });
