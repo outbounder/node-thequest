@@ -312,27 +312,18 @@ socket.on("treasureTrapped", function(p1Data, p2Data){
 })
 
 socket.on("endgame", function (victory) {
-
   if (victory)
     TweenLite.to(winText3D.position, 1.5, {y: 10, ease: Bounce.easeOut});
   else
     TweenLite.to(loseText3D.position, 1.5, {y: 10, ease: Bounce.easeOut});
 
-  /*$(".endLabel").hide();
-  victory?$(".winLabel").show():$(".looseLabel").show();
-
   var player = getPlayerByUsername(user.username);
-  player.victories += victory?1:0;
-  $(".victoriesCount").html(player.victories);
-
-  console.log("endgame:", victory)*/
+  player.victories += victory ? 1 : 0;
 })
 
 socket.on("restart", function(){
-  //$(".endLabel").hide();
-
-  TweenLite.to(winText3D.position, 1.5, {y: 1000, ease: Cubic.easeIn});
-  TweenLite.to(loseText3D.position, 1.5, {y: 1000, ease: Cubic.easeIn});
+  TweenLite.to(winText3D.position, 1, {y: 1000, ease: Cubic.easeIn});
+  TweenLite.to(loseText3D.position, 1, {y: 1000, ease: Cubic.easeIn});
 
   for (var i = 0;i < players.length;i ++)
     gameContainer3d.remove(players[i].model);

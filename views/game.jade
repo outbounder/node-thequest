@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  h1 TheQuest
+  .title TheQuest
   .menu
     a(href="/users/logout") logout
     .timeLeft.menuItem
@@ -9,10 +9,6 @@ block content
       | Victories:
       span.victoriesCount 0
   .gameWorld
-    .winLabel.endLabel You win
-    .looseLabel.endLabel You loose :|
-  
-
 
   
   script.

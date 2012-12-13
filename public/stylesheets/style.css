@@ -5,12 +5,16 @@ body {
   position: absolute;
 }
 
-h1 {
-  position: absolute;;
+.title {
+  top: 30px;
+  left: 20px;
+  font-size: 44px;
+  position: absolute;
+  color: #FFFFFF;
 }
 
 a {
-  color: #00B7FF;
+  color: #FFFFFF;
 }
 
 .name {
@@ -24,45 +28,15 @@ a {
   margin: 0 auto;
 }
 
-.player {
-  width: 32px;
-  height: 33px;
-  position: absolute;
-  border: 1px solid green;
-  background: url('/pacman.png') top left no-repeat;
-}
-
-.coin {
-  display: none;
-  width: 32px;
-  height: 32px;
-  background: url('/coin.png') top left no-repeat;
-  position: absolute;
-  left: 25px;
-}
-
-.endLabel {
-  width: 800px;
-  height: 600px;
-  margin: 0 auto;
-  text-align: center;
-  font-size: 48px;
-  line-height: 600px;
-  color: white;
-  background-color: gray;
-  opacity: 0.5;
-  position: absolute;
-  z-index: 100;
-}
-
 .menu {
-  top: 50px;
+  color: #FFFFFF;
+  top: 20px;
+  right: 20px;
   margin: 0 auto;
-  width: 800px;
   position: absolute;
 }
 
 .menuItem {
   float:left;
-  width: 250px;
+  width: 100px;
 }
