@@ -6,7 +6,7 @@ require("./vendor/easing/EasePack.min");
 
 //var Stats = require("./vendor/stats.min");
 //console.log("###:", Stats);
-var socket = io.connect();
+
 
 var Player = require("./views/Player3D");
 var players = [];
@@ -76,7 +76,6 @@ var loader = new THREE.JSONLoader();
 var world3d;
 
 var callbackWorld = function ( geometry, materials ) {
-
   world3d = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
   world3d.position.y = 105;
   world3d.position.x = 0;
@@ -91,30 +90,24 @@ var winText3D;
 var loseText3D;
 
 var callbackWinText = function ( geometry, materials ) {
-
   winText3D = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
   winText3D.scale.x = 10;
   winText3D.scale.y = 10;
   winText3D.scale.z = 10;
   winText3D.position.y = 1000;
 
-  //TweenLite.to(winText3D.position, 1.5, {y: 10, ease: Bounce.easeOut});
-  
   stageContainer3d.add( winText3D );
 };
 
 loader.load( "models/win-text.js", callbackWinText, "textures");
 
 var callbackLoseText = function ( geometry, materials ) {
-
   loseText3D = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
   loseText3D.scale.x = 10;
   loseText3D.scale.y = 10;
   loseText3D.scale.z = 10;
   loseText3D.position.y = 1000;
 
-  //TweenLite.to(loseText3D.position, 1.5, {y: 10, ease: Bounce.easeOut});
-  
   stageContainer3d.add( loseText3D );
 };
 
@@ -125,7 +118,6 @@ var materials = [];
 var parameters;
 
 function initParticles() {
-
   var particles, geometry, i, h, color, sprite, size;
   var mouseX = 0, mouseY = 0;
 
@@ -173,8 +165,6 @@ function initParticles() {
     particles.rotation.y = Math.random() * 6;
     particles.rotation.z = Math.random() * 6;
 
-    console.log("particles:", particles.rotation.x, particles.rotation.y, particles.rotation.z);
-
     scene.add( particles );
     systems.push(particles);
   }
@@ -188,7 +178,6 @@ function initParticles() {
 }
 
 function renderParticles() {
-  console.log("renderParticles");
   var time = Date.now() * 0.00005;
 
   for ( i = 0; i < systems.length; i ++ ) 
@@ -256,6 +245,7 @@ var addOrUpdate = function(playerData){
   }
 }
 
+var socket = io.connect();
 
 socket.on("registered", function(){
   socket.emit("addPlayer");  
