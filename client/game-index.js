@@ -208,21 +208,6 @@ var callbackSnowman = function ( geometry, materials ) {
   showmanGeometry = geometry;
   showmanMaterial = materials;
 
-
-
-
-/*function createScene( geometry, materials, x, y, z, b ) {
-
-  zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-  zmesh.position.set( x, y, z );
-  zmesh.scale.set( 3, 3, 3 );
-  scene.add( zmesh );
-
-  createMaterialsPalette( materials, 100, b );
-
-}*/
-
-
 $(".gameWorld").append(renderer.domElement);
 
 function render() {
@@ -345,8 +330,6 @@ $(window).on("keyup", function(e){
   e.preventDefault();
   socket.emit("directionChange", false, direction(e));
 });
-
-$(".endLabel").hide();
 
 };
 
