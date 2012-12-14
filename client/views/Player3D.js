@@ -13,12 +13,17 @@ module.exports = function(data, scene, geometry, materials, light){
   this.body.castShadow = true;
   this.body.receiveShadow = true;
 
-  this.light2 = new THREE.PointLight( 0xff6600, 10, 120 ); 
+  this.light2 = new THREE.PointLight( 0xff6600, 5, 120 ); 
   this.light2.visible = false;
   this.light2.position.y = 90; 
   this.light2.position.z = 20; 
   this.body.add( this.light2 );
 
+  console.log(this.body);
+
+  for (var s in materials)
+    if (materials[s].name == "02_-_Default")
+      materials[s] = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
 
   var geometry = new THREE.Geometry();
   var sprite = THREE.ImageUtils.loadTexture( "textures/snowflake4.png" );

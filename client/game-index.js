@@ -197,6 +197,8 @@ var callbackSnowman = function ( geometry, materials ) {
   showmanGeometry = geometry;
   showmanMaterial = materials;
 
+  console.log(materials);
+
 $(".gameWorld").append(renderer.domElement);
 
 function render() {
@@ -283,6 +285,8 @@ socket.on("endgame", function (victory) {
 
   var player = getPlayerByUsername(user.username);
   player.victories += victory ? 1 : 0;
+
+  $(".victoriesCount").html(player.victories);
 })
 
 socket.on("restart", function(){
