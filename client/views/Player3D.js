@@ -8,6 +8,19 @@ module.exports = function(data, scene, geometry, materials, light){
 
   this.model = new THREE.Object3D();
 
+  materials = [].concat(materials);
+
+  for (var s in materials)
+    if (materials[s].name == "02_-_Default")
+    {
+      var n = materials[s].name;
+
+      materials[s] = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+      materials[s].name = n;
+      console.log("-----COLOR-------", materials[s].color);
+    }
+      
+
   this.body = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial( materials ));
   this.body.material.ambient = this.body.material.color;
   this.body.castShadow = true;
@@ -20,10 +33,6 @@ module.exports = function(data, scene, geometry, materials, light){
   this.body.add( this.light2 );
 
   console.log(this.body);
-
-  for (var s in materials)
-    if (materials[s].name == "02_-_Default")
-      materials[s] = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
 
   var geometry = new THREE.Geometry();
   var sprite = THREE.ImageUtils.loadTexture( "textures/snowflake4.png" );
