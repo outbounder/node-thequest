@@ -16,7 +16,7 @@ if(exec(remote(updateDependenciesCommand)).code != 0){
   exit(1);
 }
 
-var stopCommand = home+" forever stop thequest.js";
+var stopCommand = home+" forever stop thequest-christmas.js";
 if(exec(remote(stopCommand)).code != 0){
   echo("Error: failed to stop remote "+stopCommand);
   exit(1);
