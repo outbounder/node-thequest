@@ -120,7 +120,7 @@ var callbackLoseText = function ( geometry, materials ) {
 
 loader.load( "models/lose-text.js", callbackLoseText, "textures");
 
-
+var systems = [];
 var materials = [];
 var parameters;
 
@@ -176,7 +176,7 @@ function initParticles() {
     console.log("particles:", particles.rotation.x, particles.rotation.y, particles.rotation.z);
 
     scene.add( particles );
-
+    systems.push(particles);
   }
 
   //console.log("Stats", Stats);
@@ -191,25 +191,14 @@ function renderParticles() {
   console.log("renderParticles");
   var time = Date.now() * 0.00005;
 
-  for ( i = 0; i < scene.children.length; i ++ ) {
-
-    var object = scene.children[ i ];
-
-    if ( object instanceof THREE.ParticleSystem ) {
-
-      object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
-
-    }
-
-  }
+  for ( i = 0; i < systems.length; i ++ ) 
+      systems[i].rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
 
   for ( i = 0; i < materials.length; i ++ ) {
-
     color = parameters[i][0];
 
     h = ( 360 * ( color[0] + time ) % 360 ) / 360;
     materials[i].color.setHSV( h, color[1], color[2] );
-
   }
 }
 
