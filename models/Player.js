@@ -173,8 +173,8 @@ var create = function (client, world) {
     
     if (time < 0 || time > 1) {
       console.log("error in calcualtion: collision time calcualte to ", time, " cycles. speeds and positions:"
-      , " player1: {", player1.speed, player1.position, "}"
-      , " player2: {", player2.speed, player2.position, "}");
+      , " player1: {" + player1.speed + " " + player1.position + "}"
+      , " player2: {" + player2.speed + " " + player2.position + "}");
       return 1;
     }
     return time;
