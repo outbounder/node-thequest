@@ -61,6 +61,19 @@ var _proto = (function () {
     });
     return result;
   }
+
+  vector.length = function(){
+    var that = this;
+    var result = 0;
+    Dimensions.each(function(dim) {
+      result += that[dim]*that[dim];
+    });
+    return Math.sqrt(result);
+  }
+
+  vector.unitVector = function(){
+    return this.multiply(1/this.length());
+  }
   
   vector.toString = function () {
     var that = this;

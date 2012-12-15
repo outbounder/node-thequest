@@ -59,6 +59,7 @@ var create = function () {
   
   //always ticks, therefore method must always be present
   var doGameCycle = function(){
+    
     world.updateGame();
     
     /* 

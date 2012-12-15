@@ -76,9 +76,8 @@ var create = function (client, world) {
   }
   
   that.update = function () {
-    position = that.calcPosition(speed, forceDirection);
+    position = that.calcPosition(speed, forceDirection);;
   }
-  
   
   that.updateSpeed = function (_speed, _forceDirection) {
     speed = that.calcSpeed(_speed, _forceDirection);
@@ -171,12 +170,12 @@ var create = function (client, world) {
     
     var time = Math.min.apply(Math, timesAfterImpact);
     
-    if (time < 0 || time > 1) {
+    /*if (time < 0 || time > 1) {
       console.log("error in calcualtion: collision time calcualte to ", time, " cycles. speeds and positions:"
       , " player1: {" + player1.speed + " " + player1.position + "}"
       , " player2: {" + player2.speed + " " + player2.position + "}");
       return 1;
-    }
+    }*/
     return time;
   };
   
@@ -186,22 +185,22 @@ var create = function (client, world) {
 
     if (that.isColliding(player)) {
       //resolve collision
-      var timeOfImpact = calcTimeOfImpact(that, player);
+      //var timeOfImpact = calcTimeOfImpact(that, player);
       
       //revert time to time of impact
-      that.moveTime(-timeOfImpact);
-      player.moveTime(-timeOfImpact);
+      /*that.moveTime(-timeOfImpact);
+      player.moveTime(-timeOfImpact);*/
     
       //swap speeds
-      var tmp = that.speed;
-      that.speed = player.speed;
-      player.speed = tmp;
+      that.speed = that.speed.multiply(-1);
+      player.speed = player.speed.multiply(-1);
+      console.log(that.speed, player.speed);
       
       //move with time of impact - elastic hit occured before "timeOfImpact", we must proceed moving forward
-      that.moveTime(timeOfImpact);
-      player.moveTime(timeOfImpact);
+      /*that.moveTime(timeOfImpact);
+      player.moveTime(timeOfImpact);*/
       
-      that.ensureCollisionIsResolved(player);
+      //that.ensureCollisionIsResolved(player);
       
       //swap treasure owner
       tmp = that.hasTreasure;

@@ -1,5 +1,7 @@
 var _ = require("underscore");
-
+var Dimensions = require("./Dimensions");
+var Vector = require("./Vector");
+var DIMENSIONS = Vector.create({x: 32, y: 32});
 
 var rand = function(LowerRange, UpperRange){
   return Math.floor(Math.random() * (UpperRange - LowerRange + 1)) + LowerRange;
@@ -14,22 +16,48 @@ module.exports = function(duration){
   this.endTime = duration + timestamp();
   var that = this;
   this.running = true;
+  var collisions = [];
+  var collisionsMap = [];
   
   that.applyGameRules = function () {
+    collisions = [];
+    collisionsMap = [];
+
     var players = that.players;
-    players.forEach(function (player) {
-      player.update();
-    });
+    for (var i = players.length - 1; i >= 0; i--) {
+      players[i].update();
+    };
     
-    players.forEach(function (player) {
+    for (var i = players.length - 1; i >= 0; i--) {
+      var player = players[i];
       player.handleGameAreaCollisions({left: 0, top: 0, right: that.width, bottom: that.height});
-      players.forEach(function (anotherPlayer) {
-	if (player !== anotherPlayer) {
-	  player.handlePlayerCollisions(anotherPlayer);
-	}
-      });
-    });
-    
+      
+      // find collisions
+      for (var k = players.length - 1; k >= 0; k--) {
+        if(players[k] === player) continue;
+        if(player.isColliding(players[k]) && !collisionsMap[i+k]) {
+          collisions.push([player, players[k]]);
+          collisionsMap[i+k] = true;
+        }
+      };
+    };
+
+    // resolve collisions
+    for(var c = 0; c<collisions.length; c++) {
+      var p1 = collisions[c][0];
+      var p2 = collisions[c][1];
+      tmp = p1.hasTreasure;
+      p1.hasTreasure = p2.hasTreasure;
+      p2.hasTreasure = tmp;
+      
+      var p1speed = p1.speed;
+      var p2speed = p2.speed;
+      var speedDiff = p2speed.substract(p1speed);
+      var force = speedDiff.unitVector().multiply(64);
+
+      p1.speed = p2speed.add(force).multiply(0.5);
+      p2.speed = p1speed.add(force).multiply(-0.5);
+    }
   }
   
   that.updateGame = function () {
