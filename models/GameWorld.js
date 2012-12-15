@@ -13,7 +13,7 @@ module.exports = function(duration){
   this.players = [];
   this.endTime = duration + timestamp();
   var that = this;
-  
+  this.running = true;
   
   that.applyGameRules = function () {
     var players = that.players;
@@ -33,6 +33,8 @@ module.exports = function(duration){
   }
   
   that.updateGame = function () {
+    if(this.running == false) return;
+
     that.applyGameRules();
     this.timeLeft = Math.floor((this.endTime - timestamp()) / 1000);
     that.broadcast("updateGame", that.getGameState());
@@ -75,6 +77,9 @@ _.extend(module.exports.prototype, {
     var p = this.players[rand(0,this.players.length-1)];
     p.hasTreasure = true;
     this.broadcast("treasureTrapped", p.state);
+  },
+  pause: function(){
+    this.running = false;
   },
   restart: function () {
     this.broadcast("restart");

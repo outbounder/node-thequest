@@ -50,9 +50,9 @@ var create = function () {
     
     setTimeout(function () {
       var _world = world;
-      game.startWorld();
       _world.declareWinner();
-      _world.restart();
+      _world.pause();
+      setTimeout(function(){ game.startWorld(); _world.restart(); }, 2500);
     }, GAME_DURATION);
   };
   
