@@ -6,9 +6,9 @@ var _ = require("underscore")
 //FIXME: this function is duplicated in Player and World.. do something about it
 var rand = function(LowerRange, UpperRange){
   return Math.floor(Math.random() * (UpperRange - LowerRange + 1)) + LowerRange;
-}
+};
 
-var create = function (client, world) {
+var create = function (client, world, a_avatar) {
   var that = Object.create(client)
   , id = _.uniqueId()
   , forceDirection = Directions.enumMap()

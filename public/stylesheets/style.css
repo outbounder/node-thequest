@@ -15,11 +15,14 @@ a {
 }
 
 .gameWorld {
-  width: 800px;
-  height: 600px;
-  margin: 0 auto;
-  border: 1px solid red;
   position: relative;
+  width: 800px;
+  height: 500px;
+  margin: 0 auto;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 3px #aaa;
+  background: #fffaE0;
 }
 
 .player {
@@ -41,7 +44,7 @@ a {
 
 .endLabel {
   width: 800px;
-  height: 600px;
+  height: 500px;
   margin: 0 auto;
   text-align: center;
   font-size: 48px;
@@ -69,14 +72,18 @@ a {
   display: inline-block;
   margin: 5px;
   width: 50px;
-  padding-top: 50px;
-  background-position: left top;
+  padding-bottom: 50px;
+  background-position: left bottom;
+  background-repeat: no-repeat;
   background-size: 100% auto;
   text-align: center;
+  cursor: pointer;
 }
-.avatar input{}
+.avatar input{
+  margin: 0;
+}
 #label-1{
-  background-image: url('../chicko.svg');
+  background-image: url('../chichko.svg');
 }
 #label-2{
   background-image: url('../franky.svg');

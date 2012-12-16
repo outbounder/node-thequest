@@ -8,5 +8,10 @@ block content
     input(type="password", name="password", placeholder="password")
     input(type="password", name="password2", placeholder="password again")
     input.btn(type="submit", value="register")
+    div.avatar
+      label#label-1(for="avatar-1")
+        input#avatar-1(type="radio", name="avatar", value="1")
+      label#label-2(for="avatar-2")
+        input#avatar-2(type="radio", name="avatar", value="2")
   .orLogin
     a.btn(href="/users/login") Login
