@@ -72,8 +72,8 @@ module.exports = function(duration){
 
 _.extend(module.exports.prototype, {
   players: null,
-  width: 800, // px
-  height: 500, // px
+  width: 700, // px
+  height: 400, // px
   timeLeft: 0, // sec
   gameDuration: 30, // sec
   gameTickInterval: 1000, // milis

@@ -1,18 +1,16 @@
 extends layout
 
 block content
-  .menu
-    a(href="/users/logout") logout
-    .timeLeft.menuItem
-    .victories.menuItem
-      | Victories:
-      span.victoriesCount 0
-  .gameWorld
-    .winLabel.endLabel You win
-    .looseLabel.endLabel You loose :|
-  
-
-
+  .wrapper
+    .menu
+      a(href="/users/logout") logout
+      .timeLeft.menuItem
+      .victories.menuItem
+        | Victories:
+        span.victoriesCount 0
+    .gameWorld
+      .winLabel.endLabel You win
+      .looseLabel.endLabel You loose :|
   
   script.
     user = !{JSON.stringify(user)}
