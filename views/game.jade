@@ -1,18 +1,20 @@
 extends layout
 
 block content
-  .gameTitle 
-    h1 TheQuest
-    a(href="javascript: void(0)").soundToggle Toggle sound off
-  .menu
-    a(href="/users/logout") logout
-    .timeLeft.menuItem
-    .victories.menuItem
-      | Victories:
-      span.victoriesCount 0
-  .gameWorld
-    .winLabel.endLabel You win
-    .looseLabel.endLabel You loose :|
+  .gameHUD
+    .gameTitle 
+      h1 TheQuest
+      a(href="javascript: void(0)").soundToggle Toggle sound off
+    .wrapper
+      .menu
+        a(href="/users/logout") logout
+        .timeLeft.menuItem
+        .victories.menuItem
+          span.victoriesCount 0
+      .gameWorld
+        .winLabel.endLabel You win
+        .looseLabel.endLabel You loose :|
+
   
 
 

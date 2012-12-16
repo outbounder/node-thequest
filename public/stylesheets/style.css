@@ -1,7 +1,11 @@
+body, html {
+  height: 100%;
+}
+
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   overflow: hidden;
+  padding-top: 40px;
 }
 
 a {
@@ -14,12 +18,47 @@ a {
   left: 3px;
 }
 
-.gameWorld {
-  width: 800px;
+.gameHUD {
+  
+  height: 100%;
+  background-color: #000;
+}
+
+.wrapper{
+  width: 900px;
   height: 600px;
   margin: 0 auto;
-  border: 1px solid red;
+  background-image: url('../images/viewport.png');
+  background-repeat: no-repeat;
+  background-position: 50% top;
+}
+
+.menu {
   position: relative;
+  overflow: hidden;
+  padding: 70px 220px 80px;
+}
+
+/* logout link */
+.menu a{
+  position: absolute;
+  z-index: 10;
+  right:120px;
+  top: 85px;
+}
+
+.menuItem {
+  float: left;
+  width: 50%;
+  text-align: center;
+  color: white;
+}
+
+.gameWorld {
+  position: relative;
+  width: 700px;
+  height: 400px;
+  margin: 0 auto;
 }
 
 .player {
@@ -38,8 +77,8 @@ a {
 }
 
 .endLabel {
-  width: 800px;
-  height: 600px;
+  width: 700px;
+  height: 400px;
   margin: 0 auto;
   text-align: center;
   font-size: 48px;
@@ -64,6 +103,7 @@ a {
   float:left;
   width: 250px;
 }
+
 
 .player #avatar {
   width: 32px;

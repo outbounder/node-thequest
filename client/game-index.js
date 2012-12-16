@@ -77,7 +77,7 @@ socket.on("removePlayer", function(playerData){
 });
 
 socket.on("updateGame", function (gameState) {
-  $(".timeLeft").html("Time left:"+gameState.timeLeft);
+  $(".timeLeft").html(gameState.timeLeft);
   //expect playerStates to be an array
   for (var i = 0; i < gameState.players.length; i ++) {
     addOrUpdate(gameState.players[i]);
