@@ -11,6 +11,7 @@ var create = function (socket, user) {
   
   client.username = user.username;
   client.victories = 0;
+  client.avatar = "0";
   
   client.endgame = function (victory) {
     client.victories += victory;
@@ -65,7 +66,9 @@ var create = function (socket, user) {
   client.onDirectionChange = createPlaceholder("directionChange");
   client.onRemovePlayer = createPlaceholder("disconnect");
   
-  socket.on("addPlayer", function(){
+  socket.on("addPlayer", function(data){
+    if(data)
+      client.avatar = data.avatar;
     client.onAddPlayer();
   });
 

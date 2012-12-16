@@ -1,0 +1,7 @@
+.chooseAvatar.dialog
+  h1.title Choose your avatar
+  ul
+    - each file in players
+      li 
+        a.avatar(href="javascript: void(0)", data-file= file)
+          img(src= "/images/players/#{file}")

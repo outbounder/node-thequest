@@ -1,4 +1,9 @@
 _ = require("./vendor/underscore");
+Backbone = require("./vendor/backbone");
+require("./vendor/jquery/bPopup");
+require("./vendor/jquery/center");
+
+
 var socket = io.connect();
 
 var Player = require("./views/Player");
@@ -29,7 +34,15 @@ var addOrUpdate = function(playerData){
 }
 
 socket.on("registered", function(){
-  socket.emit("addPlayer");  
+  var Dialog = require("./views/ChooseAvatarDialog");
+  var chooseAvatarDialog = new Dialog({ model: user });
+  chooseAvatarDialog.on("confirm", function(avatarType){
+    socket.emit("addPlayer", {avatar: avatarType});
+  });
+  chooseAvatarDialog.on("close", function(){
+    socket.emit('addPlayer');
+  })
+  chooseAvatarDialog.render();
 });
 
 socket.on("addPlayer", function(playerData){

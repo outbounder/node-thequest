@@ -27,7 +27,6 @@ a {
   height: 33px;
   position: absolute;
   border: 1px solid green;
-  background: url('/pacman.png') top left no-repeat;
 }
 
 .coin {
@@ -61,4 +60,32 @@ a {
 .menuItem {
   float:left;
   width: 250px;
+}
+
+.player #avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.dialog {
+  background-color: #FFF;
+  border: 1 solid #AAA;
+  border-radius: 25px;
+  width: 400px;
+}
+
+.chooseAvatar.dialog ul {
+  list-style: none;
+  padding: 0px;
+  margin: 0 auto;
+}
+
+.chooseAvatar.dialog ul li {
+  text-align: center;
+  padding: 0px;
+  margin: 0px;
+}
+
+.chooseAvatar.dialog .title {
+  text-align: center;
 }

@@ -15,6 +15,7 @@ var express = require('express')
   , SessionSockets = require('session.socket.io')
   , mongoose = require("mongoose")
   , browserify = require("browserify")
+  , requireJade = require("require-jade")
   , http = require('http')
   , path = require('path');
 
@@ -45,10 +46,15 @@ db.once("open", function(){
     }));
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));
-    app.use(browserify("./client/game-index.js", {
+    var bundle = browserify({
       mount: "/game-index.js",
+      watch: true,
+      debug: true,
       cache: false
-    }));
+    })
+      .use(requireJade)
+      .addEntry("./client/game-index.js");
+    app.use(bundle);
   });
 
   app.configure('development', function(){

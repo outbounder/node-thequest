@@ -14,7 +14,8 @@
     "session.socket.io": "*",
     "browserify": "*",
     "underscore": "*",
-    "mongoose": "*"
+    "mongoose": "*",
+    "require-jade": "*"
   },
   "devDependencies": {
     "jasmine-node": "*",

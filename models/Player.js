@@ -49,6 +49,7 @@ var create = function (client, world) {
       return {
         username: that.username
         , hasTreasure: that.hasTreasure
+        , avatar: that.avatar
         , x: Math.round(that.position.x)
         , y: Math.round(that.position.y)
         , width: DIMENSIONS.x
