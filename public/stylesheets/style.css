@@ -12,10 +12,17 @@ a {
   color: #00B7FF;
 }
 
+.pull-right {
+  float: right;
+}
+.credits {
+  margin-right: 50px;
+}
 .name {
   position: absolute;
   top: 36px;
   left: 3px;
+  color: #00B7FF;
 }
 
 .gameHUD {

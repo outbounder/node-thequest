@@ -4,21 +4,22 @@ block content
   .gameHUD
     .gameTitle 
       h1 TheQuest
-      a(href="javascript: void(0)").soundToggle Toggle sound off
+      .soundToggleBtn
+        a(href="javascript: void(0)").soundToggle Toggle sound off
+      .logoutBtn
+        a(href="/users/logout") logout
     .wrapper
       .menu
-        a(href="/users/logout") logout
         .timeLeft.menuItem
         .victories.menuItem
           span.victoriesCount 0
       .gameWorld
         .winLabel.endLabel You win
         .looseLabel.endLabel You loose :|
-
-  
-
-
-  
+    .credits.pull-right
+      h5 Hosted by 
+        a(href='http://camplight.net/', title='Camplight') Camplight
   script.
     user = !{JSON.stringify(user)}
   script(src="/game-index.js")
+    
