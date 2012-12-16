@@ -40,6 +40,7 @@ light.shadowMapHeight = 2048;
 
 scene.add( light );
 
+
 var renderer = new THREE.WebGLRenderer( { antialias: true} );
 renderer.setSize(ww, hh);
 renderer.shadowMapEnabled = true;
