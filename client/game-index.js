@@ -7,13 +7,6 @@ var rand = function(LowerRange, UpperRange){
   return Math.floor(Math.random() * (UpperRange - LowerRange + 1)) + LowerRange;
 }
 
-// Audo not supported mockup.
-if(typeof Audio != "function") {
-  var Audio = function(){
-    this.play = function(){}
-  };
-}
-
 var sounds = {
   trapped: new Audio("sounds/trap.wav"),
   start: new Audio("sounds/start.wav"),
