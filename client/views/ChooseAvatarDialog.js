@@ -6,7 +6,7 @@ module.exports = Backbone.View.extend({
   render: function(){
     var self = this;
     this.$el.html(this.template({
-      players: ["0.png", "1.png", "2.png", "3.png", "4.png", "5.gif", "6.gif", "7.png", "8.png", "9.gif"]
+      players: ["0.png", "1.png", "2.png", "3.png", "4.png", "5.gif", "6.gif", "7.png", "8.png", "9.gif", "10.png"]
     }));
     this.$el.bPopup({
       modalClose: false
