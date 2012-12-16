@@ -128,14 +128,17 @@ var direction = function (e) {
 }
 
 $(window).on("keydown", function(e){
+  e.preventDefault();
   socket.emit("directionChange", true, direction(e));
 });
 
 $(window).on("keyup", function(e){
+  e.preventDefault();
   socket.emit("directionChange", false, direction(e));
 });
 
 $(".soundToggle").click(function(e){
+  e.preventDefault();
   sounds.enabled = !sounds.enabled;
   if(sounds.enabled)
     $(".soundToggle").text("Toggle sound off");
