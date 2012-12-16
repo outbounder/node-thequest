@@ -4,8 +4,14 @@ block content
   h1 Login
   .error #{error}
   form(method="POST")
-    input(type="text", name="username", placeholder="username")
-    input(type="password", name="password", placeholder="password")
-    input.btn(type="submit", value="login")
+    div.login
+      input(type="text", name="username", placeholder="username")
+      input(type="password", name="password", placeholder="password")
+      input.btn(type="submit", value="login")
+    div.avatar
+      label#label-1(for="avatar-1")
+        input#avatar-1(type="radio", name="avatar")
+      label#label-2(for="avatar-2")
+        input#avatar-2(type="radio", name="avatar")
   .orRegister
     a.btn(href="/users/register") Register

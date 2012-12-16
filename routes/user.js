@@ -7,15 +7,15 @@ module.exports = {
     res.redirect("/users/login");
   },
   "GET /login": function(req, res) {
-    res.render('user/login', { title: 'Thequest login', error: null });  
+    res.render('user/login', { title: 'Thequest login', error: null });
   },
   "POST /login": function(req, res) {
     User.findOneByUsernamePassword(req.body.username, req.body.password, function(err, user){
       if(user) {
         req.session.userId = user.id;
-        res.redirect("/game")
+        res.redirect("/game");
       } else
-        res.render("user/login", { title: 'Thequest login', error: 'invalid user'})
+        res.render("user/login", { title: 'Thequest login', error: 'invalid user'});
     });
   },
   "GET /register": function(req, res) {
@@ -28,6 +28,6 @@ module.exports = {
         res.redirect("/game");
       } else
         res.render("user/register", { title: "Thequest register", error: err});
-    })
+    });
   }
 }

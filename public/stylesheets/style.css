@@ -62,3 +62,22 @@ a {
   float:left;
   width: 250px;
 }
+
+/* avatar selection in login */
+.avatar{}
+.avatar label{
+  display: inline-block;
+  margin: 5px;
+  width: 50px;
+  padding-top: 50px;
+  background-position: left top;
+  background-size: 100% auto;
+  text-align: center;
+}
+.avatar input{}
+#label-1{
+  background-image: url('../chicko.svg');
+}
+#label-2{
+  background-image: url('../franky.svg');
+}

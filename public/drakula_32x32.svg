@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="32px" height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<path fill="#290F0E" d="M30.874,20.988c0-4.723-6.687-8.551-14.937-8.551c-8.25,0-14.937,3.828-14.937,8.551
+	c0,0.121,0.023,0.237,0.032,0.357V30c0,0,3.852,2.152,7.387,0c3.536-2.152,12.146,2.915,14.453,0s7.97,0,7.97,0v-8.654
+	C30.852,21.226,30.874,21.109,30.874,20.988z"/>
+<polygon fill="#290F0E" points="0.875,9.625 31,9.625 17.197,29.438 "/>
+<ellipse fill="#6699FF" cx="16.125" cy="14.382" rx="9.667" ry="13.257"/>
+<path opacity="0.5" d="M15.938,6.252c-2.493,0-4.648,1.424-5.71,3.5c1.063,2.076,3.218,3.5,5.71,3.5c2.494,0,4.648-1.424,5.71-3.5
+	C20.586,7.676,18.432,6.252,15.938,6.252z"/>
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="16.064" y1="27.6406" x2="16.064" y2="14.4292">
+	<stop  offset="0" style="stop-color:#D91F20"/>
+	<stop  offset="1" style="stop-color:#FF3B2E;stop-opacity:0"/>
+</linearGradient>
+<path fill="url(#SVGID_1_)" d="M16.063,27.641c5.229,0,9.482-5.863,9.708-13.212H6.355C6.581,21.777,10.834,27.641,16.063,27.641z"
+	/>
+<polygon fill="#FFFFFF" points="-48.921,37.685 -45.639,31.097 -51.983,31.097 "/>
+<polygon opacity="0.5" points="13.079,24.685 16.361,18.097 10.017,18.097 "/>
+<polygon fill="#FFFFFF" points="11.204,24.56 14.486,17.972 8.142,17.972 "/>
+<polygon opacity="0.5" points="21.192,24.694 24.474,18.106 18.13,18.106 "/>
+<polygon fill="#FFFFFF" points="19.537,24.81 22.818,18.222 16.475,18.222 "/>
+<path fill="#FFFFFF" d="M15.958,4.917c-2.493,0-4.648,1.424-5.71,3.5c1.063,2.076,3.218,3.5,5.71,3.5c2.493,0,4.647-1.424,5.71-3.5
+	C20.605,6.341,18.451,4.917,15.958,4.917z"/>
+<circle fill="#DF0018" cx="17.75" cy="7.583" r="1.917"/>
+<line fill="#FFFFFF" stroke="#231F20" stroke-width="0.75" stroke-miterlimit="10" x1="8.372" y1="18.082" x2="24.333" y2="18.082"/>
+</svg>
