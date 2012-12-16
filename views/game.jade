@@ -1,16 +1,16 @@
 extends layout
 
 block content
-  h1 TheQuest
-  .menu
-    a(href="/users/logout") logout
-    .timeLeft.menuItem
-    .victories.menuItem
-      | Victories:
-      span.victoriesCount 0
-  .gameWorld
-    .winLabel.endLabel You win
-    .looseLabel.endLabel You loose :|
+  .wrapper
+    .menu
+      a(href="/users/logout") logout
+      .timeLeft.menuItem
+      .victories.menuItem
+        | Victories:
+        span.victoriesCount 0
+    .gameWorld
+      .winLabel.endLabel You win
+      .looseLabel.endLabel You loose :|
   
 
 
