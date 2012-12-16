@@ -8,7 +8,7 @@ var rand = function(LowerRange, UpperRange){
 }
 
 // Audo not supported mockup.
-if(!Audio) {
+if(typeof Audio != "function") {
   var Audio = function(){
     this.play = function(){}
   };
