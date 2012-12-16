@@ -51,6 +51,10 @@ a {
   z-index: 100;
 }
 
+.gameTitle {
+  float: left;
+}
+
 .menu {
   margin: 0 auto;
   width: 800px;
