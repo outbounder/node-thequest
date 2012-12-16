@@ -3,6 +3,33 @@ Backbone = require("./vendor/backbone");
 require("./vendor/jquery/bPopup");
 require("./vendor/jquery/center");
 
+var rand = function(LowerRange, UpperRange){
+  return Math.floor(Math.random() * (UpperRange - LowerRange + 1)) + LowerRange;
+}
+
+// Audo not supported mockup.
+if(!Audio) {
+  var Audio = function(){
+    this.play = function(){}
+  };
+}
+
+var sounds = {
+  trapped: new Audio("sounds/trap.wav"),
+  start: new Audio("sounds/start.wav"),
+  win: [
+    new Audio("sounds/yahoo1.wav"),
+    new Audio("sounds/yahoo2.wav"),
+    new Audio("sounds/yeahaw1.wav"),
+    new Audio("sounds/yeahaw2.wav"),
+    new Audio("sounds/yeahaw3.wav"),
+    new Audio("sounds/yow.wav")
+  ],
+  lose: [
+    new Audio("sounds/oooo.wav"),
+    new Audio("sounds/ouch.wav")
+  ]
+}
 
 var socket = io.connect();
 
@@ -61,17 +88,18 @@ socket.on("updateGame", function (gameState) {
   for (var i = 0; i < gameState.players.length; i ++) {
     addOrUpdate(gameState.players[i]);
   }
+  if(gameState.treasureTrapped)
+    sounds.trapped.play();
 });
-
-socket.on("treasureTrapped", function(p1Data, p2Data){
-  _.extend(getPlayerById(p1Data.playerId), p1Data).render();
-  if(p2Data)
-    _.extend(getPlayerById(p2Data.playerId), p2Data).render();
-})
 
 socket.on("endgame", function (victory) {
   $(".endLabel").hide();
   victory?$(".winLabel").show():$(".looseLabel").show();
+
+  if(victory)
+    sounds.win[rand(0,sounds.win.length)].play();
+  else
+    sounds.lose[rand(0, sounds.lose.length)].play();
 
   var player = getPlayerByUsername(user.username);
   player.victories += victory?1:0;
@@ -84,6 +112,7 @@ socket.on("restart", function(){
 
   players = [];
   socket.emit("addPlayer");
+  sounds.start.play();
 });
 
 var direction = function (e) {

@@ -18,10 +18,16 @@ module.exports = function(duration){
   this.running = true;
   var collisions = [];
   var collisionsMap = [];
+  this.gameState = {
+    players: [],
+    timeLeft: 0,
+    treasureTrapped: false
+  };
   
   that.applyGameRules = function () {
     collisions = [];
     collisionsMap = [];
+    this.gameState.treasureTrapped = false;
 
     var players = that.players;
     for (var i = players.length - 1; i >= 0; i--) {
@@ -49,6 +55,8 @@ module.exports = function(duration){
       tmp = p1.hasTreasure;
       p1.hasTreasure = p2.hasTreasure;
       p2.hasTreasure = tmp;
+      if(p1.hasTreasure || p2.hasTreasure)
+        this.gameState.treasureTrapped = true;
       
       var p1speed = p1.speed;
       var p2speed = p2.speed;
@@ -113,16 +121,12 @@ _.extend(module.exports.prototype, {
     this.broadcast("restart");
   },
   getGameState: function () {
-    var gameState = {
-      players: [],
-      timeLeft: this.timeLeft
-    };
-    
+    this.gameState.timeLeft = this.timeLeft;
+    this.gameState.players = [];
     for (var i = 0; i < this.players.length; i ++) {
-      gameState.players.push(this.players[i].state);
+      this.gameState.players.push(this.players[i].state);
     }
-    
-    return gameState;
+    return this.gameState;
   },
   declareWinner: function () {
     this.players.forEach(function (pl) {

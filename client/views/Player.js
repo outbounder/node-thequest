@@ -1,6 +1,5 @@
 module.exports = function(data){
   _.extend(this, data);
-  console.log(data);
   this.$el = $("<div><img id='avatar' /><div class='name'></div><div class='coin'></div></div>");
   this.$el.find("#avatar").attr("src", this.getAvatarUrl());
 }
