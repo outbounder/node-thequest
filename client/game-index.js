@@ -64,6 +64,12 @@ scene.add(stageContainer3d);
 plane.position.z = -20;
 stageContainer3d.add( plane );*/
 
+var starLight = new THREE.PointLight( 0xfff58a, 3, 700 ); 
+starLight.position.x = -120; 
+starLight.position.y = 300; 
+starLight.position.z = -270; 
+gameContainer3d.add( starLight );
+
 
 var showmanMaterial;
 var showmanGeometry;
