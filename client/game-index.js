@@ -5,11 +5,38 @@ require("./vendor/easing/EasePack.min");
 
 
 //var Stats = require("./vendor/stats.min");
-//console.log("###:", Stats);
+//console.log("###:", Stats);monitor
 
 
 var Player = require("./views/Player3D");
 var players = [];
+
+
+var Preloader = function() {
+  this.total = 0;
+  this.loaded = 0;
+
+  var _self = this;
+  
+  this.complete = null;
+  this.listen = function(fn) {
+    _self.total ++; 
+    console.log("listen:", _self.total);
+    return function() {
+      _self.loaded ++;
+
+      console.log("listenComplete:", _self.loaded, arguments);
+
+      if (fn)
+        fn.apply(null, arguments);
+
+      if (_self.total == _self.loaded && _self.complete)
+        _self.complete();
+    }
+  }
+}
+
+
 
 var ww = window.innerWidth;
 var hh = window.innerHeight;
@@ -70,55 +97,23 @@ starLight.position.y = 300;
 starLight.position.z = -270; 
 gameContainer3d.add( starLight );
 
-
 var showmanMaterial;
 var showmanGeometry;
+
+var preloader = new Preloader();
 
 var light2 = new THREE.PointLight( 0xff6600, 1.5, 1000 ); 
 light2.position.y = 100; 
 light2.position.z = 30; 
 gameContainer3d.add( light2 );
 
-var loader = new THREE.JSONLoader();
 var world3d;
 
-var callbackWorld = function ( geometry, materials ) {
-  world3d = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-  world3d.position.y = 105;
-  world3d.position.x = 0;
-  world3d.castShadow = true;
-
-  stageContainer3d.add( world3d );
-};
-
-loader.load( "models/world.js", callbackWorld, "textures");
-
-var winText3D;
-var loseText3D;
-
-var callbackWinText = function ( geometry, materials ) {
-  winText3D = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-  winText3D.scale.x = 10;
-  winText3D.scale.y = 10;
-  winText3D.scale.z = 10;
-  winText3D.position.y = 1000;
-
-  stageContainer3d.add( winText3D );
-};
-
-loader.load( "models/win-text.js", callbackWinText, "textures");
-
-var callbackLoseText = function ( geometry, materials ) {
-  loseText3D = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-  loseText3D.scale.x = 10;
-  loseText3D.scale.y = 10;
-  loseText3D.scale.z = 10;
-  loseText3D.position.y = 1000;
-
-  stageContainer3d.add( loseText3D );
-};
-
-loader.load( "models/lose-text.js", callbackLoseText, "textures");
+var sprite1 = THREE.ImageUtils.loadTexture( "textures/snowflake1.png", null, preloader.listen());
+var sprite2 = THREE.ImageUtils.loadTexture( "textures/snowflake2.png", null, preloader.listen());
+var sprite3 = THREE.ImageUtils.loadTexture( "textures/snowflake3.png", null, preloader.listen());
+var sprite4 = THREE.ImageUtils.loadTexture( "textures/snowflake4.png", null, preloader.listen());
+var sprite5 = THREE.ImageUtils.loadTexture( "textures/snowflake5.png", null, preloader.listen());
 
 var systems = [];
 var materials = [];
@@ -133,13 +128,7 @@ function initParticles() {
 
   geometry = new THREE.Geometry();
 
-  sprite1 = THREE.ImageUtils.loadTexture( "textures/snowflake1.png" );
-  sprite2 = THREE.ImageUtils.loadTexture( "textures/snowflake2.png" );
-  sprite3 = THREE.ImageUtils.loadTexture( "textures/snowflake3.png" );
-  sprite4 = THREE.ImageUtils.loadTexture( "textures/snowflake4.png" );
-  sprite5 = THREE.ImageUtils.loadTexture( "textures/snowflake5.png" );
-
-  for ( i = 0; i < 200; i ++ ) {
+  for (var i = 0; i < 200; i ++ ) {
 
     var vertex = new THREE.Vector3();
     vertex.x = Math.random() * 3000 - 1500;
@@ -184,7 +173,7 @@ function initParticles() {
   container.appendChild( stats.domElement );*/
 }
 
-function renderParticles() {
+var renderParticles = function() {
   var time = Date.now() * 0.00005;
 
   for ( i = 0; i < systems.length; i ++ ) 
@@ -198,37 +187,7 @@ function renderParticles() {
   }
 }
 
-
-
-var callbackSnowman = function ( geometry, materials ) {
-  showmanGeometry = geometry;
-  showmanMaterial = materials;
-
-  console.log(materials);
-
 $(".gameWorld").append(renderer.domElement);
-
-function render() {
-  
-  requestAnimationFrame(render);
-
-  renderParticles();
-  renderer.render(scene, camera);
-}
-
-window.addEventListener( 'resize', onWindowResize, false );
-
-initParticles();
-render();
-
-function onWindowResize() {
-
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize( window.innerWidth, window.innerHeight );
-
-}
 
 var getPlayerById = function(playerId){
   for(var i = 0; i<players.length; i++)
@@ -254,84 +213,169 @@ var addOrUpdate = function(playerData){
   }
 }
 
-var socket = io.connect();
+// LOAD OBJETCTS
 
-socket.on("registered", function(){
-  socket.emit("addPlayer");  
-});
+var callbackWorld = function ( geometry, materials ) {
+  world3d = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+  world3d.position.y = 105;
+  world3d.position.x = 0;
+  world3d.castShadow = true;
 
-socket.on("addPlayer", function(playerData){
-  addOrUpdate(playerData);
-});
+  stageContainer3d.add( world3d );
+};
 
-socket.on("removePlayer", function(playerData){
-  var p = getPlayerById(playerData.playerId);
-  players.splice(players.indexOf(p), 1);
-  p.remove();
-});
+var loader = new THREE.JSONLoader();
+loader.load( "models/world.js", preloader.listen(callbackWorld), "textures");
 
-socket.on("updateGame", function (gameState) {
-  $(".timeLeft").html("Time left:"+gameState.timeLeft);
-  //expect playerStates to be an array
-  for (var i = 0; i < gameState.players.length; i ++) {
-    addOrUpdate(gameState.players[i]);
+console.log("-1-");
+
+var winText3D;
+var loseText3D;
+
+var callbackWinText = function ( geometry, materials ) {
+  winText3D = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+  winText3D.scale.x = 10;
+  winText3D.scale.y = 10;
+  winText3D.scale.z = 10;
+  winText3D.position.y = 1000;
+
+  stageContainer3d.add( winText3D );
+};
+
+loader = new THREE.JSONLoader();
+loader.load( "models/win-text.js", preloader.listen(callbackWinText), "textures");
+
+console.log("-2-");
+
+var callbackLoseText = function ( geometry, materials ) {
+  loseText3D = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+  loseText3D.scale.x = 10;
+  loseText3D.scale.y = 10;
+  loseText3D.scale.z = 10;
+  loseText3D.position.y = 1000;
+
+  stageContainer3d.add( loseText3D );
+};
+
+loader = new THREE.JSONLoader();
+loader.load( "models/lose-text.js", preloader.listen(callbackLoseText), "textures");
+
+
+var callbackSnowman = function ( geometry, materials ) {
+  showmanGeometry = geometry;
+  showmanMaterial = materials;
+
+  console.log(materials);
+};
+
+loader = new THREE.JSONLoader();
+loader.load("models/snowman1.js", preloader.listen(callbackSnowman), "textures");
+
+var initAll =  function() {
+
+  initParticles();
+
+  var render = function() {
+    requestAnimationFrame(render);
+
+    renderParticles();
+    renderer.render(scene, camera);
   }
-});
 
-socket.on("treasureTrapped", function(p1Data, p2Data){
-  _.extend(getPlayerById(p1Data.playerId), p1Data).render();
-  if(p2Data)
-    _.extend(getPlayerById(p2Data.playerId), p2Data).render();
-})
+  var onWindowResize = function() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 
-socket.on("endgame", function (victory) {
-  if (victory)
-    TweenLite.to(winText3D.position, 1.5, {y: 10, ease: Bounce.easeOut});
-  else
-    TweenLite.to(loseText3D.position, 1.5, {y: 10, ease: Bounce.easeOut});
+    renderer.setSize( window.innerWidth, window.innerHeight );
 
-  var player = getPlayerByUsername(user.username);
-  player.victories += victory ? 1 : 0;
+  }
 
-  $(".victoriesCount").html(player.victories);
-})
+  window.addEventListener( 'resize', onWindowResize, false );
+  render();
 
-socket.on("restart", function(){
-  TweenLite.to(winText3D.position, 1, {y: 1000, ease: Cubic.easeIn});
-  TweenLite.to(loseText3D.position, 1, {y: 1000, ease: Cubic.easeIn});
+  var socket = io.connect();
 
-  for (var i = 0;i < players.length;i ++)
-    gameContainer3d.remove(players[i].model);
+  socket.on("registered", function(){
+    socket.emit("addPlayer");  
+  });
 
-  players = [];
-  socket.emit("addPlayer");
-});
+  socket.on("addPlayer", function(playerData){
+    addOrUpdate(playerData);
+  });
 
-var direction = function (e) {
-  var dir = "";
-  
-  if(e.keyCode == 37)
-    dir = "left"
-  if(e.keyCode == 39)
-    dir = "right";
-  if(e.keyCode == 40)
-    dir = "bottom";
-  if(e.keyCode == 38)
-    dir = "top";
-  
-  return dir;
-}
+  socket.on("removePlayer", function(playerData){
+    var p = getPlayerById(playerData.playerId);
+    players.splice(players.indexOf(p), 1);
+    p.remove();
+  });
 
-$(window).on("keydown", function(e){
-  e.preventDefault();
-  socket.emit("directionChange", true, direction(e));
-});
+  socket.on("updateGame", function (gameState) {
+    $(".timeLeft").html("Time left:"+gameState.timeLeft);
+    //expect playerStates to be an array
+    for (var i = 0; i < gameState.players.length; i ++) {
+      addOrUpdate(gameState.players[i]);
+    }
+  });
 
-$(window).on("keyup", function(e){
-  e.preventDefault();
-  socket.emit("directionChange", false, direction(e));
-});
+  socket.on("treasureTrapped", function(p1Data, p2Data){
+    _.extend(getPlayerById(p1Data.playerId), p1Data).render();
+    if(p2Data)
+      _.extend(getPlayerById(p2Data.playerId), p2Data).render();
+  })
+
+  socket.on("endgame", function (victory) {
+    if (victory)
+      TweenLite.to(winText3D.position, 1.5, {y: 10, ease: Bounce.easeOut});
+    else
+      TweenLite.to(loseText3D.position, 1.5, {y: 10, ease: Bounce.easeOut});
+
+    var player = getPlayerByUsername(user.username);
+    player.victories += victory ? 1 : 0;
+
+    $(".victoriesCount").html(player.victories);
+  })
+
+  socket.on("restart", function(){
+    TweenLite.to(winText3D.position, 1, {y: 1000, ease: Cubic.easeIn});
+    TweenLite.to(loseText3D.position, 1, {y: 1000, ease: Cubic.easeIn});
+
+    for (var i = 0;i < players.length;i ++)
+      gameContainer3d.remove(players[i].model);
+
+    players = [];
+    socket.emit("addPlayer");
+  });
+
+  var direction = function (e) {
+    var dir = "";
+    
+    if(e.keyCode == 37)
+      dir = "left"
+    if(e.keyCode == 39)
+      dir = "right";
+    if(e.keyCode == 40)
+      dir = "bottom";
+    if(e.keyCode == 38)
+      dir = "top";
+    
+    return dir;
+  }
+
+  $(window).on("keydown", function(e){
+    e.preventDefault();
+    socket.emit("directionChange", true, direction(e));
+  });
+
+  $(window).on("keyup", function(e){
+    e.preventDefault();
+    socket.emit("directionChange", false, direction(e));
+  });
 
 };
 
-loader.load("models/snowman1.js", callbackSnowman, "textures");
+var _self = this;
+
+preloader.complete = function() {
+  console.log("---ALL LOADED---");
+  initAll();
+}
