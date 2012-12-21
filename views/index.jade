@@ -29,14 +29,15 @@ block content
         | , realtime MMO game. The goal is simple - steal the treasure. Have fun NOW with your friends or other players all over the world.
       p
         a.btn.btn-primary.btn-large(href='/game') Play now » 
-        span.visitorsTitle  Visitors:
-        span.visitorsCount= 0
+        //
+          span.visitorsTitle  Visitors:
+          span.visitorsCount= 0
 
-        script.
-          var socket = io.connect();
-          socket.on('visitorsOnline', function (data) {
-            $(".visitorsCount").html(data);
-          });
+          script.
+            var socket = io.connect();
+            socket.on('visitorsOnline', function (data) {
+              $(".visitorsCount").html(data);
+            });
     // columns 
 
     .row

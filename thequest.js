@@ -30,7 +30,12 @@ var db = mongoose.createConnection(config.mongoose.hostname,
                                   config.mongoose.opts);
 db.once("open", function(){
   require("./models/Backbone").db = db;
-  
+
+  var gameCodeBundle = browserify({
+    mount: "/game-index.js",
+    cache: false
+  });
+
   app.configure(function(){
     app.set('port', process.env.PORT || 3000);
     app.set('views', __dirname + '/views');
@@ -46,16 +51,20 @@ db.once("open", function(){
     }));
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));
-    app.use(browserify("./client/game-index.js", {
-      mount: "/game-index.js",
-      cache: false,
-      debug: true
-    }));
   });
 
   app.configure('development', function(){
+    gameCodeBundle.include(null, "config", "module.exports = "+JSON.stringify(require("./client/config/development"))+";");
+    gameCodeBundle.addEntry("./client/game-index.js");
     app.use(express.errorHandler());
+    app.use(gameCodeBundle);
   });
+
+  app.configure('staging', function(){
+    gameCodeBundle.include(null, "config", "module.exports = "+JSON.stringify(require("./client/config/staging"))+";");
+    gameCodeBundle.addEntry("./client/game-index.js");
+    app.use(gameCodeBundle);
+  })
 
   app.get('/', routes.index);
   actions.mount(app, require("./routes/user"));

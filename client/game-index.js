@@ -1,4 +1,5 @@
 _ = require("./vendor/underscore");
+var socket = io.connect(require("config").socketio);
 
 require("./vendor/TweenLite.min");
 require("./vendor/easing/EasePack.min");
