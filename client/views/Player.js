@@ -22,6 +22,8 @@ _.extend(module.exports.prototype, {
       case "6":
       case "9":
         return path+".gif";
+      default:
+        return path+"11.png";
     }
   },
   render: function(){
