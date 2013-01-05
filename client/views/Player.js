@@ -16,6 +16,7 @@ _.extend(module.exports.prototype, {
       case "7":
       case "8":
       case "10":
+      case "11":
         return path+".png";
       case "5":
       case "6":
