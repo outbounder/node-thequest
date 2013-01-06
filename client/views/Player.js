@@ -16,11 +16,14 @@ _.extend(module.exports.prototype, {
       case "7":
       case "8":
       case "10":
+      case "11":
         return path+".png";
       case "5":
       case "6":
       case "9":
         return path+".gif";
+      default:
+        return path+"11.png";
     }
   },
   render: function(){
