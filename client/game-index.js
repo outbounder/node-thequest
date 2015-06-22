@@ -101,6 +101,7 @@ socket.on("map", function(map){
   //expect playerStates to be an array
   for (var i = 0; i < gameState.players.length; i ++) {
     var player = gameState.players[i];
+    players.add(player, {merge: true});
     players.get(player.username).set(player);
   }
 })

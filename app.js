@@ -38,10 +38,10 @@ db.once("open", function(){
     }));
     app.use(app.router);
     app.use(express.static(path.join(__dirname, 'public')));
-    app.use(browserify(__dirname+"/client/game-index.js", {
-      mount: "/game-index.js",
-      cache: false
-    }));
+    // app.use(browserify(__dirname+"/client/game-index.js", {
+    //   mount: "/game-index.js",
+    //   cache: false
+    // }));
   });
 
   app.configure('development', function(){

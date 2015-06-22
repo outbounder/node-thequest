@@ -1,6 +1,6 @@
 module.exports = Backbone.Model.extend({
 
-  idAttribute:"username",
+  idAttribute: "username",
 
   defaults:{
     hasTreasure: null,
